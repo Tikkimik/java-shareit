@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;

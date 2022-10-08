@@ -1,13 +1,9 @@
 package ru.practicum.shareit.item.repository;
 
-import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Repository
 public class ItemRepository {
