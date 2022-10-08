@@ -24,7 +24,7 @@ public class ItemMapper {
     public static List<ItemDto> toListItemDto(List<Item> allItems) {
         List<ItemDto> itemDtoList = new ArrayList<>();
 
-        for(Item i: allItems) {
+        for (Item i : allItems) {
             itemDtoList.add(new ItemDto(i.getId(), i.getName(), i.getDescription(), i.getAvailable(), i.getOwner()));
         }
 

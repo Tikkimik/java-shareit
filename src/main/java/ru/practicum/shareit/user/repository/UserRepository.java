@@ -25,12 +25,12 @@ public class UserRepository {
         this.id = 1L;
     }
 
-    private Long generateId(){
+    private Long generateId() {
         return id++;
     }
 
     public User createUser(User user) throws CreatingException {
-        if(checkUserEmail(user)){
+        if (checkUserEmail(user)) {
             Long id = generateId();
             user.setId(id);
             userStorage.put(id, user);
@@ -62,7 +62,7 @@ public class UserRepository {
         }
 
         for (User u : userStorage.values()) {
-            if(u.getEmail().equals(user.getEmail())){
+            if (u.getEmail().equals(user.getEmail())) {
                 throw new CreatingException("email duplicate");
             }
         }

@@ -23,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) throws NotFoundParameterException {
-        if(userRepository.getUser(userId) != null) {
+        if (userRepository.getUser(userId) != null) {
             Item item = ItemMapper.toItem(userRepository.getUser(userId), itemDto);
             return ItemMapper.toItemDto(itemRepository.createItem(item));
         } else {
@@ -39,20 +39,20 @@ public class ItemServiceImpl implements ItemService {
 
         boolean userCheck = Objects.equals(itemFromRepository.getOwner().getId(), userId);
 
-        if(userCheck) {
-            if(item.getName() != null) {
+        if (userCheck) {
+            if (item.getName() != null) {
                 itemFromRepository.setName(item.getName());
             }
 
-            if(item.getDescription() != null) {
+            if (item.getDescription() != null) {
                 itemFromRepository.setDescription(item.getDescription());
             }
 
-            if(item.getAvailable() != null) {
+            if (item.getAvailable() != null) {
                 itemFromRepository.setAvailable(item.getAvailable());
             }
 
-            if(item.getOwner() != null) {
+            if (item.getOwner() != null) {
                 itemFromRepository.setOwner(item.getOwner());
             }
         } else {

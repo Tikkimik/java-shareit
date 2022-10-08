@@ -29,7 +29,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto update(@PathVariable Long userId,
-                   @Validated({Update.class}) @RequestBody UserDto userDto) throws CreatingException {
+                          @Validated({Update.class}) @RequestBody UserDto userDto) throws CreatingException {
         return userService.updateUser(userId, userDto);
     }
 
@@ -39,12 +39,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser (@PathVariable Long userId) {
+    public UserDto getUser(@PathVariable Long userId) {
         return userService.getUser(userId);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser (@PathVariable Long userId) {
+    public void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
     }
 }

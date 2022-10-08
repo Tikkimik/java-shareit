@@ -24,6 +24,6 @@ public class ItemDto {
     private String description;
     @NotNull(groups = {Create.class})
     private Boolean available;
-   // @NotNull(groups = {Update.class})
+    // @NotNull(groups = {Update.class})
     private User owner;
 }

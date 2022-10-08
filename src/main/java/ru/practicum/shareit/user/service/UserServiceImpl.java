@@ -27,12 +27,12 @@ public class UserServiceImpl implements UserService {
         User userFromStorage = userRepository.getUser(userId);
         User user = UserMapper.toUser(userDto);
 
-        if(user.getName() != null){
+        if (user.getName() != null) {
             userFromStorage.setName(user.getName());
         }
 
-        if(user.getEmail() != null) {
-            if(userRepository.checkUserEmail(user)) {
+        if (user.getEmail() != null) {
+            if (userRepository.checkUserEmail(user)) {
                 userFromStorage.setEmail(user.getEmail());
             }
         }
@@ -41,12 +41,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers(){
+    public List<UserDto> getAllUsers() {
         return UserMapper.toListUserDto(userRepository.getAllUsers());
     }
 
     @Override
-    public UserDto getUser(Long userId){
+    public UserDto getUser(Long userId) {
         return UserMapper.toUserDto(userRepository.getUser(userId));
     }
 

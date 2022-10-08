@@ -1,14 +1,11 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
-
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * TODO Sprint add-controllers.

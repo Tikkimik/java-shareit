@@ -16,7 +16,7 @@ public class ItemRepository {
         this.itemId = 1L;
     }
 
-    private Long generateId(){
+    private Long generateId() {
         return itemId++;
     }
 
@@ -32,10 +32,10 @@ public class ItemRepository {
     }
 
     public List<Item> getAllItems(Long userId) {
-        List <Item> userItems = new ArrayList<>();
+        List<Item> userItems = new ArrayList<>();
 
-        for(Item i: itemStorage.values()){
-            if(Objects.equals(i.getOwner().getId(), userId)) {
+        for (Item i : itemStorage.values()) {
+            if (Objects.equals(i.getOwner().getId(), userId)) {
                 userItems.add(i);
             }
         }
@@ -44,18 +44,18 @@ public class ItemRepository {
     }
 
     public List<Item> searchAvailableItem(String text) {
-        List <Item> researchList = new ArrayList<>();
+        List<Item> researchList = new ArrayList<>();
 
-        if(text == null || text.equals("")) {
+        if (text == null || text.equals("")) {
             return researchList;
         }
 
-        for(Item i: itemStorage.values()) {
+        for (Item i : itemStorage.values()) {
             if (i.getAvailable()) {
                 if (i.getName().toLowerCase().contains(text.toLowerCase())) {
                     researchList.add(i);
                 } else {
-                    if(i.getDescription().toLowerCase().contains(text.toLowerCase())) {
+                    if (i.getDescription().toLowerCase().contains(text.toLowerCase())) {
                         researchList.add(i);
                     }
                 }
