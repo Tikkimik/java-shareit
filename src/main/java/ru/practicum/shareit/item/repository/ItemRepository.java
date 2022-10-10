@@ -45,17 +45,18 @@ public class ItemRepository {
 
     public List<Item> searchAvailableItem(String text) {
         List<Item> researchList = new ArrayList<>();
+        String searchText = text.toLowerCase();
 
-        if (text == null || text.equals("")) {
+        if (searchText.equals("")) {
             return researchList;
         }
 
         for (Item i : itemStorage.values()) {
             if (i.getAvailable()) {
-                if (i.getName().toLowerCase().contains(text.toLowerCase())) {
+                if (i.getName().toLowerCase().contains(searchText)) {
                     researchList.add(i);
                 } else {
-                    if (i.getDescription().toLowerCase().contains(text.toLowerCase())) {
+                    if (i.getDescription().toLowerCase().contains(searchText)) {
                         researchList.add(i);
                     }
                 }

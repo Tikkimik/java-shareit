@@ -11,43 +11,38 @@ import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 public class ItemController {
 
     @Autowired
-    ItemServiceImpl itemService;
+    private ItemServiceImpl itemService;
 
     @PostMapping
-    ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                       @Validated({Create.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
+    public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
+                              @Validated({Create.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
         return itemService.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    ItemDto updateItem(@PathVariable Long itemId,
-                       @RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                       @Validated({Update.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
+    public ItemDto updateItem(@PathVariable Long itemId,
+                              @RequestHeader(value = "X-Sharer-User-Id") Long userId,
+                              @Validated({Update.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
         return itemService.updateItem(itemId, userId, itemDto);
     }
 
     @GetMapping
-    List<ItemDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+    public List<ItemDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         return itemService.getAllItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    ItemDto getItem(@PathVariable Long itemId) {
+    public ItemDto getItem(@PathVariable Long itemId) throws NotFoundParameterException {
         return itemService.getItem(itemId);
     }
 
     @GetMapping("/search")
-    List<ItemDto> searchAvailableItem(@RequestParam String text) {
+    public List<ItemDto> searchAvailableItem(@RequestParam String text) {
         return itemService.searchAvailableItem(text);
     }
-
-
 }

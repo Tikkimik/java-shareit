@@ -14,7 +14,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public UserDto createUser(UserDto userDto) throws CreatingException {

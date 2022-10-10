@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.user.model.User;
@@ -13,8 +12,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-@Validated
 @Repository
 public class UserRepository {
     private final Map<Long, User> userStorage;
@@ -47,14 +44,8 @@ public class UserRepository {
         return new ArrayList<>(userStorage.values());
     }
 
-    public User updateUser(Long id, User user) {
-        user.setId(id);
-        userStorage.put(id, user);
-        return user;
-    }
-
     public boolean checkUserEmail(User user) throws CreatingException {
-        Pattern pattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+        Pattern pattern = Pattern.compile("^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         Matcher matcher = pattern.matcher(user.getEmail());
 
         if (!matcher.matches()) {

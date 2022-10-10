@@ -14,7 +14,7 @@ public interface ItemService {
 
     List<ItemDto> getAllItems(Long userId);
 
-    ItemDto getItem(Long itemId);
+    ItemDto getItem(Long itemId) throws NotFoundParameterException;
 
     List<ItemDto> searchAvailableItem(String text);
 }
