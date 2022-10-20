@@ -16,7 +16,7 @@ public interface UserService {
 
     UserDto getUser(Long userId) throws NotFoundParameterException;
 
-    void deleteUser(Long userId);
+    void deleteUser(Long userId) throws NotFoundParameterException;
 
 }
 

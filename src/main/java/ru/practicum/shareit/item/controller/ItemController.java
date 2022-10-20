@@ -37,8 +37,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId) throws NotFoundParameterException {
-        return itemService.getItem(itemId);
+    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                           @PathVariable Long itemId) throws NotFoundParameterException {
+        return itemService.getItem(userId, itemId);
     }
 
     @GetMapping("/search")

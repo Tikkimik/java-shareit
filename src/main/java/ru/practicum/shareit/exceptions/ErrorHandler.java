@@ -15,19 +15,19 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleThrowable(final MethodArgumentNotValidException e) {
         log.info("400 {}", e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse(String.format("MethodArgumentNotValidException \"%s\".", e.getParameter()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
-        return new ErrorResponse(String.format("Ошибка с полем \"%s\".", e.getParameter()));
+        return new ErrorResponse(String.format("IncorrectParameterException \"%s\".", e.getParameter()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundParameterException(final NotFoundParameterException e) {
         log.info("404 {}", e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse(String.format("NotFoundParameterException \"%s\".", e.getParameter()));
     }
 }

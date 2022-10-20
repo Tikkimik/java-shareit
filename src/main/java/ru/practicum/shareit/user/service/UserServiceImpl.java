@@ -25,13 +25,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
+
         checkUserEmail(userDto);
         userRepository.save(userMapper.toUser(userDto));
         return userMapper.toUserDto(userRepository.getUserByEmail(userDto.getEmail()));
+
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto userDto) throws NotFoundParameterException {                 //причесать метод а то уродский
+    public UserDto updateUser(Long userId, UserDto userDto) throws NotFoundParameterException {//причесать метод а то уродский
         UserDto userFromStorage = getUser(userId);
         userFromStorage.setId(userId);
         if (userDto.getEmail() != null) {
@@ -54,21 +56,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(Long userId) throws NotFoundParameterException {
-        if (!userRepository.existsById(userId))
-            throw new NotFoundParameterException("Exception: Wrong user id.");
-
+        checkUserId(userId);
         return userMapper.toUserDto(userRepository.getReferenceById(userId));
     }
 
     @Override
-    public void deleteUser(Long userId) throws IncorrectParameterException {
-        if (!userRepository.existsById(userId))
-            throw new IncorrectParameterException("Exception: Wrong user id.");
-
+    public void deleteUser(Long userId) throws NotFoundParameterException {
+        checkUserId(userId);
         userRepository.deleteAllById(List.of(userId));
     }
 
+    private void checkUserId(Long userId) throws NotFoundParameterException {
+
+        if (!userRepository.existsById(userId))
+            throw new NotFoundParameterException("Exception: Wrong user id.");
+
+    }
+
     private void checkUserEmail(UserDto userDto) throws IncorrectParameterException {
+
         if (userDto.getEmail() == null)
             throw new IncorrectParameterException("Exception: Email address cannot be null");
 

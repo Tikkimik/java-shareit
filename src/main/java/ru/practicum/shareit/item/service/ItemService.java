@@ -8,13 +8,14 @@ import java.util.List;
 
 public interface ItemService {
 
-    ItemDto createItem(long userId, ItemDto itemDto) throws CreatingException, NotFoundParameterException;
+    ItemDto createItem(Long userId, ItemDto itemDto) throws CreatingException, NotFoundParameterException;
 
     ItemDto updateItem(Long itemId, Long userId, ItemDto itemDto) throws NotFoundParameterException;
 
     List<ItemDto> getAllItems(Long userId);
 
-    ItemDto getItem(Long itemId) throws NotFoundParameterException;
+    ItemDto getItem(Long userId, Long itemId) throws NotFoundParameterException;
 
     List<ItemDto> searchAvailableItem(String text);
+
 }
