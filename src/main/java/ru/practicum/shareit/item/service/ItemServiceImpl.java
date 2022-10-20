@@ -7,8 +7,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,19 +18,20 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private ItemRepository itemRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+//    @Autowired
+//    private UserRepository userRepository;
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) throws NotFoundParameterException {
-        User user = userRepository.getUser(userId);
+      //  User user = userRepository.getUser(userId);
 
-        if (user != null) {
-            Item item = ItemMapper.toItem(userRepository.getUser(userId), itemDto);
-            return ItemMapper.toItemDto(itemRepository.createItem(item));
-        } else {
-            throw new NotFoundParameterException("user not found");
-        }
+//        if (user != null) {
+//            Item item = ItemMapper.toItem(userRepository.getUser(userId), itemDto);
+//            return ItemMapper.toItemDto(itemRepository.createItem(item));
+//        } else {
+//            throw new NotFoundParameterException("user not found");
+//        }
+        return null;
     }
 
     @Override

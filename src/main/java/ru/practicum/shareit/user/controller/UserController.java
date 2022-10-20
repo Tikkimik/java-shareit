@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.helperСlasses.Create;
 import ru.practicum.shareit.helperСlasses.Update;
 import ru.practicum.shareit.exceptions.CreatingException;
@@ -26,7 +27,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto update(@PathVariable Long userId,
-                          @Validated({Update.class}) @RequestBody UserDto userDto) throws CreatingException {
+                          @Validated({Update.class}) @RequestBody UserDto userDto) throws CreatingException, NotFoundParameterException {
         return userService.updateUser(userId, userDto);
     }
 
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) {
+    public UserDto getUser(@PathVariable Long userId) throws NotFoundParameterException {
         return userService.getUser(userId);
     }
 
@@ -44,4 +45,5 @@ public class UserController {
     public void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
     }
+
 }
