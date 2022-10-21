@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto userDto) throws NotFoundParameterException {//причесать метод а то уродский
+    public UserDto updateUser(Long userId, UserDto userDto) throws NotFoundParameterException {
         UserDto userFromStorage = getUser(userId);
         userFromStorage.setId(userId);
         if (userDto.getEmail() != null) {
