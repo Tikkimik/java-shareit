@@ -3,13 +3,22 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoWithAuthorAndItem;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.CommentMapper;
 import ru.practicum.shareit.item.model.ItemMapper;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,7 +33,14 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private final BookingRepository bookingRepository;
+
     private final ItemMapper itemMapper;
+    private final CommentMapper commentMapper;
 
 //    @Override
 //    public ItemDto createItem(long userId, ItemDto itemDto) throws NotFoundParameterException {
@@ -168,6 +184,28 @@ public class ItemServiceImpl implements ItemService {
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public CommentDtoWithAuthorAndItem addComment(Long userId, Long itemId, CommentDto commentDto) throws CreatingException {
+        if (commentDto.getText().isEmpty()) throw new CreatingException("Exception: Comment is empty.");
+
+        List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStartBefore(
+                itemId, userId, LocalDateTime.now()
+        );
+
+        if (bookings.size() < 1) throw new CreatingException("Exception: Can't comment on it.");
+
+        commentDto.setAuthorId(userId);
+        commentDto.setItemId(itemId);
+        commentDto.setCreated(LocalDate.now());
+
+        CommentDtoWithAuthorAndItem comment = commentMapper.toCommentDtoWithAuthorAndItem(
+                commentRepository.save(commentMapper.toComment(commentDto))
+        );
+
+        comment.setAuthorName(userRepository.getReferenceById(commentDto.getAuthorId()).getName());
+        return comment;
     }
 
     private void checkItem(ItemDto itemDto) {

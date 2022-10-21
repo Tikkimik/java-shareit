@@ -3,9 +3,12 @@ package ru.practicum.shareit.item.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exceptions.CreatingException;
+import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.helperСlasses.Create;
 import ru.practicum.shareit.helperСlasses.Update;
-import ru.practicum.shareit.exceptions.NotFoundParameterException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoWithAuthorAndItem;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
@@ -46,4 +49,11 @@ public class ItemController {
     public List<ItemDto> searchAvailableItem(@RequestParam String text) {
         return itemService.searchAvailableItem(text);
     }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDtoWithAuthorAndItem addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
+                                                  @RequestBody CommentDto commentDto) throws CreatingException {
+        return itemService.addComment(userId, itemId, commentDto);
+    }
+
 }
