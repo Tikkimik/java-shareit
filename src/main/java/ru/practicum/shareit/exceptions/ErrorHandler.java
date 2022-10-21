@@ -26,6 +26,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectStatusException(final IncorrectStatusException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getParameter());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundParameterException(final NotFoundParameterException e) {
         log.warn(e.getMessage());
@@ -38,4 +45,5 @@ public class ErrorHandler {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
+
 }

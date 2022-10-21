@@ -2,25 +2,25 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.ItemMapper;
-import ru.practicum.shareit.user.model.UserMapper;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingWithItemAndUserDto;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.exceptions.CreatingException;
-import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.NotFoundParameterException;
-import ru.practicum.shareit.booking.dto.BookingWithItemAndUserDto;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
+import ru.practicum.shareit.exceptions.IncorrectStatusException;
+import ru.practicum.shareit.exceptions.NotFoundParameterException;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.ItemMapper;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.UserMapper;
+import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.ArrayList;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public BookingWithItemAndUserDto getBooking(Long userId, Long bookingId) throws NotFoundParameterException, CreatingException {
+    public BookingWithItemAndUserDto getBooking(Long userId, Long bookingId) throws NotFoundParameterException {
         checkUserById(userId);
         checkBookingById(bookingId);
 
@@ -57,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException, CreatingException {
+    public BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException {
         checkUserById(userId);
         checkBookingTimings(bookingDto);
         checkItem(bookingDto.getItemId());
@@ -141,7 +141,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundParameterException("Exception: User can't request for this item.");
     }
 
-    private void checkItem(Long itemId) throws CreatingException, NotFoundParameterException {
+    private void checkItem(Long itemId) throws NotFoundParameterException {
         if (!itemRepository.existsById(itemId))
             throw new NotFoundParameterException("Exception: Wrong item id.");
 
@@ -156,7 +156,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundParameterException("Exception: Wrong booking id.");
     }
 
-    private void checkBookingTimings(BookingDto bookingDto) throws CreatingException {
+    private void checkBookingTimings(BookingDto bookingDto) {
         if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
             throw new IncorrectParameterException("Exception: Booking start after end booking.");
 
@@ -192,7 +192,7 @@ public class BookingServiceImpl implements BookingService {
                         bookingList.add(currentBooking);
                     break;
                 default:
-                    throw new IncorrectParameterException("Unknown state: UNSUPPORTED_STATUS");
+                    throw new IncorrectStatusException("Unknown state: UNSUPPORTED_STATUS");
             }
         }
 

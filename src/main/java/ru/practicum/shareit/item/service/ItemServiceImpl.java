@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentWithAuthorAndItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.CommentMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -99,29 +101,17 @@ public class ItemServiceImpl implements ItemService {
                 .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()))
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
-
     }
 
-//    @Override
-//    public List<ItemDto> searchAvailableItem(String text) {
-//        if (text.isEmpty()) return null;
-//
-//        return itemRepository.findAll().stream()
-//                .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()))
-//                .filter(item -> item.getAvailable().equals(true))
-//                .map(itemMapper::toItemDto)
-//                .collect(Collectors.toList());
-//    }
-
     @Override
-    public CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) throws CreatingException {
-        if (commentDto.getText().isEmpty()) throw new CreatingException("Exception: Comment is empty.");
+    public CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) {
+        if (commentDto.getText().isEmpty()) throw new IncorrectParameterException("Exception: Comment is empty.");
 
         List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStartBefore(
                 itemId, userId, LocalDateTime.now()
         );
 
-        if (bookings.size() < 1) throw new CreatingException("Exception: Can't comment on it.");
+        if (bookings.size() < 1) throw new IncorrectParameterException("Exception: Can't comment on it.");
 
         commentDto.setAuthorId(userId);
         commentDto.setItemId(itemId);
