@@ -201,7 +201,7 @@ public class BookingServiceImpl implements BookingService {
 
     private BookingWithItemAndUserDto getBookingWithItemAndUserDto(BookingDto bookingDto) {
 
-        BookingWithItemAndUserDto BookingWithItemAndUserDto = bookingMapper.toBookingWithItemAndUserDto(
+        BookingWithItemAndUserDto bookingWithItemAndUserDto = bookingMapper.toBookingWithItemAndUserDto(
                 bookingMapper.toBookingDto(bookingRepository.findBookingByStartAndEndAndBookerIdAndItemId(
                         bookingDto.getStart(),
                         bookingDto.getEnd(),
@@ -210,10 +210,10 @@ public class BookingServiceImpl implements BookingService {
                 )
         );
 
-        BookingWithItemAndUserDto.setBooker(userMapper.toUserDto(userRepository.getReferenceById(bookingDto.getBookerId())));
-        BookingWithItemAndUserDto.setItem(itemMapper.toItemDto(itemRepository.getReferenceById(bookingDto.getItemId())));
+        bookingWithItemAndUserDto.setBooker(userMapper.toUserDto(userRepository.getReferenceById(bookingDto.getBookerId())));
+        bookingWithItemAndUserDto.setItem(itemMapper.toItemDto(itemRepository.getReferenceById(bookingDto.getItemId())));
 
-        return BookingWithItemAndUserDto;
+        return bookingWithItemAndUserDto;
     }
 
     private List<BookingWithItemAndUserDto> listOfBookingWithItemAndUserDto(List<Booking> bookings) {
