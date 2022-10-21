@@ -8,8 +8,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
-//@Getter
-//@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +16,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-//    @Min(1)
     private Long id;
 
     @Column(name = "user_name", nullable = false)

@@ -198,5 +198,4 @@ public class ItemServiceImpl implements ItemService {
         item.setComments(commentWithAuthorAndItemListDto);
         return item;
     }
-
 }

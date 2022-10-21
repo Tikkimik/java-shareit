@@ -84,5 +84,4 @@ public class UserServiceImpl implements UserService {
         if (!matcher.matches())
             throw new IncorrectParameterException("Exception: email address not verified.");
     }
-
 }

@@ -22,5 +22,4 @@ public class CommentWithAuthorAndItemDto {
         this.itemId = itemId;
         this.created = created;
     }
-
 }

@@ -223,5 +223,4 @@ public class BookingServiceImpl implements BookingService {
                 .map(this::getBookingWithItemAndUserDto)
                 .collect(Collectors.toList());
     }
-
 }

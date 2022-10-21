@@ -48,5 +48,4 @@ public class BookingController {
                                              @RequestParam boolean approved) throws NotFoundParameterException {
         return bookingService.approve(userId, bookingId, approved);
     }
-
 }

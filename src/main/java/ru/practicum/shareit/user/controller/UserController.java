@@ -45,5 +45,4 @@ public class UserController {
     public void deleteUser(@PathVariable Long userId) throws NotFoundParameterException {
         userService.deleteUser(userId);
     }
-
 }
