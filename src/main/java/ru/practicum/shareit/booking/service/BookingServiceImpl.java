@@ -44,18 +44,18 @@ public class BookingServiceImpl implements BookingService {
         BookingDto bookingDto = bookingMapper.toBookingDto(bookingRepository.getReferenceById(bookingId));
 
         Item item = itemRepository.getReferenceById(bookingDto.getItemId());
-        
+
         if (!Objects.equals(bookingDto.getBookerId(), userId) && !Objects.equals(item.getOwner(), userId))
             throw new NotFoundParameterException(String.format(
                     "Exception: Wrong user id = \"%s\", booker id = \"%b\".", userId, bookingDto.getBookerId()
             ));
-        
+
         checkBookingTimings(bookingDto);
         checkItem(bookingDto.getItemId());
 
         return getBookingWithItemAndUserDto(bookingDto);
     }
-    
+
     @Override
     public BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException, CreatingException {
         checkUserById(userId);
@@ -76,22 +76,22 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingWithItemAndUserDto approve(Long userId, Long bookingId, boolean approved) throws NotFoundParameterException {
         Booking booking = bookingRepository.getReferenceById(bookingId);
-        
+
         if (booking.getStatus().equals(BookingStatus.APPROVED))
             throw new IncorrectParameterException(String.format(
                     "Exception: Wrong booking status \"%s\".", booking.getStatus()
             ));
-        
+
         Item item = itemRepository.getReferenceById(booking.getItemId());
 
         checkNotOwner(item, userId);
-        
+
         if (approved) {
             booking.setStatus(BookingStatus.APPROVED);
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
-        
+
         bookingRepository.save(booking);
         BookingDto bookingDto = bookingMapper.toBookingDto(booking);
         return getBookingWithItemAndUserDto(bookingDto);
@@ -100,11 +100,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingWithItemAndUserDto> getAllBookings(Long userId, String state) throws NotFoundParameterException {
         checkUserById(userId);
-        
+
         if (state.equals("ALL")) {
             return listOfBookingWithItemAndUserDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
         }
-        
+
         return listOfBookingWithItemAndUserDto(checkStatus(new ArrayList<>(
                 bookingRepository.findAllByBookerIdOrderByStartDesc(userId)), state)
         );
@@ -140,7 +140,7 @@ public class BookingServiceImpl implements BookingService {
         if (!Objects.equals(userId, item.getOwner()))
             throw new NotFoundParameterException("Exception: User can't request for this item.");
     }
-    
+
     private void checkItem(Long itemId) throws CreatingException, NotFoundParameterException {
         if (!itemRepository.existsById(itemId))
             throw new NotFoundParameterException("Exception: Wrong item id.");
@@ -155,7 +155,7 @@ public class BookingServiceImpl implements BookingService {
         if (!bookingRepository.existsById(bookingId))
             throw new NotFoundParameterException("Exception: Wrong booking id.");
     }
-    
+
     private void checkBookingTimings(BookingDto bookingDto) throws CreatingException {
         if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
             throw new IncorrectParameterException("Exception: Booking start after end booking.");
@@ -174,23 +174,23 @@ public class BookingServiceImpl implements BookingService {
                     if (currentBooking.getEnd().isAfter(LocalDateTime.now())
                             && currentBooking.getStart().isBefore(LocalDateTime.now()))
                         bookingList.add(currentBooking);
-                break;
+                    break;
                 case "WAITING":
                     if (currentBooking.getStatus().equals(BookingStatus.WAITING))
                         bookingList.add(currentBooking);
-                break;
+                    break;
                 case "REJECTED":
                     if (currentBooking.getStatus().equals(BookingStatus.REJECTED))
                         bookingList.add(currentBooking);
-                break;
+                    break;
                 case "PAST":
                     if (currentBooking.getEnd().isBefore(LocalDateTime.now()))
                         bookingList.add(currentBooking);
-                break;
+                    break;
                 case "FUTURE":
                     if (currentBooking.getStart().isAfter(LocalDateTime.now()))
                         bookingList.add(currentBooking);
-                break;
+                    break;
                 default:
                     throw new IncorrectParameterException("Unknown state: UNSUPPORTED_STATUS");
             }

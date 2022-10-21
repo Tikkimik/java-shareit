@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         Matcher matcher = pattern.matcher(userDto.getEmail());
 
         if (!matcher.matches())
-           throw new IncorrectParameterException("Exception: email address not verified.");
+            throw new IncorrectParameterException("Exception: email address not verified.");
     }
 
 }

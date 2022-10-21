@@ -32,17 +32,4 @@ public class Item {
 
     @Column(name = "item_request_id", nullable = false)
     private Long request;
-
-
-//    public Long getOwner() {
-//        return owner;
-//    }
-//
-//    public Item(Long id, String name, String description, Boolean available, Long owner) {
-//        this.id = id;
-//        this.name = name;
-//        this.description = description;
-//        this.available = available;
-//        this.owner = owner;
-//    }
 }

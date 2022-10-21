@@ -20,25 +20,25 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     public BookingWithItemAndUserDto getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                @PathVariable Long bookingId) throws NotFoundParameterException, CreatingException {
+                                                @PathVariable Long bookingId) throws NotFoundParameterException, CreatingException {
         return bookingService.getBooking(userId, bookingId);
     }
 
     @GetMapping
     public List<BookingWithItemAndUserDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
+                                                          @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
         return bookingService.getAllBookings(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingWithItemAndUserDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
+                                                         @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
         return bookingService.getAllByOwner(userId, state);
     }
 
     @PostMapping
     public BookingWithItemAndUserDto addBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                @RequestBody BookingDto bookingDto) throws NotFoundParameterException, CreatingException {
+                                                @RequestBody BookingDto bookingDto) throws NotFoundParameterException, CreatingException {
         return bookingService.addBooking(userId, bookingDto);
     }
 
