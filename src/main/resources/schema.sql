@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS items (
     item_name         VARCHAR(100) NOT NULL,
     item_description  VARCHAR(4000) NOT NULL,
     item_is_available Boolean NOT NULL,
-    item_request_id   BIGINT,
     item_owner_id     BIGINT NOT NULL,
     item_url          VARCHAR(1000),
+    item_request_id   BIGINT,
     CONSTRAINT FK_ITEMS_TO_USERS FOREIGN KEY(item_owner_id) REFERENCES users(user_id), UNIQUE(item_id, item_url)
 );
 
@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS booking (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     start_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     end_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    item_id    BIGINT NOT NULL,
     booker_id  BIGINT NOT NULL,
+    item_id    BIGINT NOT NULL,
     status     VARCHAR(50),
     CONSTRAINT FK_BOOKINGS_TO_USERS FOREIGN KEY(booker_id) REFERENCES users(user_id),
     CONSTRAINT FK_BOOKINGS_TO_ITEMS FOREIGN KEY(item_id) REFERENCES items(item_id)

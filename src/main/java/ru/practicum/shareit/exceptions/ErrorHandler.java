@@ -14,20 +14,28 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleThrowable(final MethodArgumentNotValidException e) {
-        log.info("400 {}", e.getMessage(), e);
+        log.warn(e.getMessage());
         return new ErrorResponse(String.format("MethodArgumentNotValidException \"%s\".", e.getParameter()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
+        log.warn(e.getMessage());
         return new ErrorResponse(String.format("IncorrectParameterException \"%s\".", e.getParameter()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundParameterException(final NotFoundParameterException e) {
-        log.info("404 {}", e.getMessage(), e);
+        log.warn(e.getMessage());
         return new ErrorResponse(String.format("NotFoundParameterException \"%s\".", e.getParameter()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowableException(final Throwable e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 }

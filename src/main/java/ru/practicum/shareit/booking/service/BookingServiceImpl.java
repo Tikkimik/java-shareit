@@ -45,9 +45,9 @@ public class BookingServiceImpl implements BookingService {
 
         Item item = itemRepository.getReferenceById(bookingDto.getItemId());
         
-        if (!Objects.equals(bookingDto.getBooker(), userId) && !Objects.equals(item.getOwner(), userId))
+        if (!Objects.equals(bookingDto.getBookerId(), userId) && !Objects.equals(item.getOwner(), userId))
             throw new NotFoundParameterException(String.format(
-                    "Exception: Wrong user id = \"%s\", booker id = \"%b\".", userId, bookingDto.getBooker()
+                    "Exception: Wrong user id = \"%s\", booker id = \"%b\".", userId, bookingDto.getBookerId()
             ));
         
         checkBookingTimings(bookingDto);
@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
         checkOwner(item, userId);
 
         bookingDto.setStatus(BookingStatus.WAITING);
-        bookingDto.setBooker(userId);
+        bookingDto.setBookerId(userId);
 
         bookingRepository.save(bookingMapper.toBooking(bookingDto));
 
@@ -84,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
         
         Item item = itemRepository.getReferenceById(booking.getItemId());
 
-        checkOwner(item, userId);
+        checkNotOwner(item, userId);
         
         if (approved) {
             booking.setStatus(BookingStatus.APPROVED);
@@ -135,6 +135,11 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.equals(userId, item.getOwner()))
             throw new NotFoundParameterException("Exception: User can't request for this item.");
     }
+
+    private void checkNotOwner(Item item, Long userId) throws NotFoundParameterException {
+        if (!Objects.equals(userId, item.getOwner()))
+            throw new NotFoundParameterException("Exception: User can't request for this item.");
+    }
     
     private void checkItem(Long itemId) throws CreatingException, NotFoundParameterException {
         if (!itemRepository.existsById(itemId))
@@ -143,7 +148,7 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.getReferenceById(itemId);
 
         if (item.getAvailable().equals(false))
-            throw new CreatingException("Exception: Item status unavailable.");
+            throw new IncorrectParameterException("Exception: Item status unavailable.");
     }
 
     private void checkBookingById(Long bookingId) throws NotFoundParameterException {
@@ -153,10 +158,10 @@ public class BookingServiceImpl implements BookingService {
     
     private void checkBookingTimings(BookingDto bookingDto) throws CreatingException {
         if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
-            throw new CreatingException("Exception: Booking start after end booking.");
+            throw new IncorrectParameterException("Exception: Booking start after end booking.");
 
         if (bookingDto.getStart().isBefore(LocalDateTime.now()))
-            throw new CreatingException("Exception: booking cannot start in the past.");
+            throw new IncorrectParameterException("Exception: booking cannot start in the past.");
     }
 
     private List<Booking> checkStatus(List<Booking> bookings, String state) {
@@ -200,12 +205,12 @@ public class BookingServiceImpl implements BookingService {
                 bookingMapper.toBookingDto(bookingRepository.findBookingByStartAndEndAndBookerIdAndItemId(
                         bookingDto.getStart(),
                         bookingDto.getEnd(),
-                        bookingDto.getBooker(),
+                        bookingDto.getBookerId(),
                         bookingDto.getItemId())
                 )
         );
 
-        BookingWithItemAndUserDto.setBooker(userMapper.toUserDto(userRepository.getReferenceById(bookingDto.getBooker())));
+        BookingWithItemAndUserDto.setBooker(userMapper.toUserDto(userRepository.getReferenceById(bookingDto.getBookerId())));
         BookingWithItemAndUserDto.setItem(itemMapper.toItemDto(itemRepository.getReferenceById(bookingDto.getItemId())));
 
         return BookingWithItemAndUserDto;

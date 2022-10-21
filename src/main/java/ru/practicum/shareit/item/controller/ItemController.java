@@ -8,8 +8,9 @@ import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.helperСlasses.Create;
 import ru.practicum.shareit.helperСlasses.Update;
 import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentDtoWithAuthorAndItem;
+import ru.practicum.shareit.item.dto.CommentWithAuthorAndItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import java.util.List;
@@ -31,17 +32,16 @@ public class ItemController {
     public ItemDto updateItem(@PathVariable Long itemId,
                               @RequestHeader(value = "X-Sharer-User-Id") Long userId,
                               @Validated({Update.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
-        return itemService.updateItem(itemId, userId, itemDto);
+        return itemService.updateItem(userId, itemId, itemDto);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
-        return itemService.getAllItems(userId);
+    public List<ItemWithBookingDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.getAllByUserId(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                           @PathVariable Long itemId) throws NotFoundParameterException {
+    public ItemWithBookingDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) throws NotFoundParameterException {
         return itemService.getItem(userId, itemId);
     }
 
@@ -51,9 +51,13 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDtoWithAuthorAndItem addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
+    public CommentWithAuthorAndItemDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
                                                   @RequestBody CommentDto commentDto) throws CreatingException {
         return itemService.addComment(userId, itemId, commentDto);
     }
 
+    @DeleteMapping("/{itemId}")
+    public void delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        itemService.delete(userId, itemId);
+    }
 }

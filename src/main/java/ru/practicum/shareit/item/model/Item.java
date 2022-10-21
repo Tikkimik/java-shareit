@@ -27,11 +27,12 @@ public class Item {
     @Column(name = "item_is_available", nullable = false)
     private Boolean available;
 
+    @Column(name = "item_owner_id", nullable = false)
+    private Long owner;
+
     @Column(name = "item_request_id", nullable = false)
     private Long request;
 
-    @Column(name = "item_owner_id", nullable = false)
-    private Long owner;
 
 //    public Long getOwner() {
 //        return owner;

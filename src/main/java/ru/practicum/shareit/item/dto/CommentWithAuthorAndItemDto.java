@@ -9,14 +9,14 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDtoWithAuthorAndItem {
+public class CommentWithAuthorAndItemDto {
     private long id;
     private String text;
     private long itemId;
     private String authorName;
     private LocalDate created;
 
-    public CommentDtoWithAuthorAndItem(long id, String text, long itemId, LocalDate created) {
+    public CommentWithAuthorAndItemDto(long id, String text, long itemId, LocalDate created) {
         this.id = id;
         this.text = text;
         this.itemId = itemId;
