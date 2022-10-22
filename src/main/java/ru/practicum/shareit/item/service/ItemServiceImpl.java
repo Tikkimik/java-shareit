@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.item.model.ItemMapper.*;
+
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
@@ -35,7 +37,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
 
-    private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
     private final BookingMapper bookingMapper;
 
@@ -44,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
         checkUserId(userId);
         checkItem(itemDto);
         itemDto.setOwner(userId);
-        return itemMapper.toItemDto(itemRepository.save(itemMapper.toItem(itemDto)));
+        return toItemDto(itemRepository.save(toItem(itemDto)));
     }
 
     @Override
@@ -53,9 +54,9 @@ public class ItemServiceImpl implements ItemService {
         if (!Objects.equals(getItem(userId, itemId).getOwner(), userId))
             throw new NotFoundParameterException("Exception: You must be the owner of an item to upgrade it.");
 
-        ItemDto itemFromRepository = itemMapper.toItemDto(itemRepository.getReferenceById(itemId));
+        ItemDto itemFromRepository = toItemDto(itemRepository.getReferenceById(itemId));
 
-        if (itemFromRepository == null) throw new NotFoundParameterException("Exception: Item not found");
+     //   if (itemFromRepository == null) throw new NotFoundParameterException("Exception: Item not found");
 
         if (itemDto.getName() != null) itemFromRepository.setName(itemDto.getName());
 
@@ -63,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
 
         if (itemDto.getAvailable() != null) itemFromRepository.setAvailable(itemDto.getAvailable());
 
-        itemRepository.save(itemMapper.toItem(itemFromRepository));
+        itemRepository.save(toItem(itemFromRepository));
         return itemFromRepository;
     }
 
@@ -91,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .filter(item -> item.getAvailable().equals(true))
                 .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                .map(itemMapper::toItemDto)
+                .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
@@ -151,7 +152,7 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemWithBookingDto setBookingsForItem(Item item, Long userId) {
 
-        ItemWithBookingDto itemDtoWithBooking = itemMapper.toItemWithBookingDto(item);
+        ItemWithBookingDto itemDtoWithBooking = toItemWithBookingDto(item);
 
         List<Booking> lastBookings = bookingRepository.findAllByItemIdAndStartIsBeforeOrderByStartDesc(
                         item.getId(), LocalDateTime.now())
