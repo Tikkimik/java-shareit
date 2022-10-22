@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface UserService {
 
-    UserDto createUser(UserDto userDto) throws CreatingException;
+    UserDto save(UserDto userDto) throws CreatingException;
 
-    UserDto updateUser(Long userId, UserDto userDto) throws CreatingException, NotFoundParameterException;
+    UserDto update(Long userId, UserDto userDto) throws NotFoundParameterException;
 
-    List<UserDto> getAllUsers();
+    List<UserDto> findAll();
 
     UserDto findById(Long userId) throws NotFoundParameterException;
 
-    void deleteUser(Long userId) throws NotFoundParameterException;
+    void deleteById(Long userId) throws NotFoundParameterException;
 
 }
 

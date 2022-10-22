@@ -23,21 +23,21 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @PostMapping
-    public UserDto createUser(@Validated({Create.class}) @RequestBody UserDto userDto) {
+    public UserDto save(@Validated({Create.class}) @RequestBody UserDto userDto) {
         checkUserEmail(userDto);
-        return userService.createUser(userDto);
+        return userService.save(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@PathVariable Long userId,
                           @Validated({Update.class}) @RequestBody UserDto userDto) throws NotFoundParameterException {
         if (userDto.getEmail() != null) checkUserEmail(userDto);
-        return userService.updateUser(userId, userDto);
+        return userService.update(userId, userDto);
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserDto> findAll() {
+        return userService.findAll();
     }
 
     @GetMapping("/{userId}")
@@ -46,8 +46,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+    public void deleteById(@PathVariable Long userId) {
+        userService.deleteById(userId);
     }
 
     private void checkUserEmail(UserDto userDto) throws IncorrectParameterException {

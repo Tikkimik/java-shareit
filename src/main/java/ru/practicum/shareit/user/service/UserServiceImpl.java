@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto save(UserDto userDto) {
         return toUserDto(userRepository.save(toUser(userDto)));
     }
 
@@ -32,24 +32,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> findAll() {
         return userRepository.findAll()
-                .stream().map(UserMapper::toUserDto)
+                .stream()
+                .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        userRepository.deleteAllById(List.of(userId));
+    public void deleteById(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto userDto) throws NotFoundParameterException {
+    public UserDto update(Long userId, UserDto userDto) throws NotFoundParameterException {
         User updatedUser = userRepository.findById(userId).orElseThrow(() ->
             new NotFoundParameterException("Exception: Wrong user id."));
 
         if (userDto.getName() != null) updatedUser.setName(userDto.getName());
         if (userDto.getEmail() != null) updatedUser.setEmail(userDto.getEmail());
-        return UserMapper.toUserDto(userRepository.save(updatedUser));
+        return toUserDto(userRepository.save(updatedUser));
     }
 }
