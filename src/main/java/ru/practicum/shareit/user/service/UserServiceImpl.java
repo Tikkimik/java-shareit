@@ -13,19 +13,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.user.model.UserMapper.toUser;
+import static ru.practicum.shareit.user.model.UserMapper.toUserDto;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
     @Override
     public UserDto createUser(UserDto userDto) {
 
         checkUserEmail(userDto);
-        userRepository.save(userMapper.toUser(userDto));
-        return userMapper.toUserDto(userRepository.getUserByEmail(userDto.getEmail()));
+        userRepository.save(toUser(userDto));
+        return toUserDto(userRepository.getUserByEmail(userDto.getEmail()));
 
     }
 
@@ -39,22 +41,21 @@ public class UserServiceImpl implements UserService {
         }
         if (userDto.getName() != null)
             userFromStorage.setName(userDto.getName());
-        userRepository.save(userMapper.toUser(userFromStorage));
+        userRepository.save(toUser(userFromStorage));
         return userFromStorage;
     }
 
     @Override
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
-                .stream()
-                .map(userMapper::toUserDto)
+                .stream().map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUser(Long userId) throws NotFoundParameterException {
         checkUserId(userId);
-        return userMapper.toUserDto(userRepository.getReferenceById(userId));
+        return toUserDto(userRepository.getReferenceById(userId));
     }
 
     @Override
