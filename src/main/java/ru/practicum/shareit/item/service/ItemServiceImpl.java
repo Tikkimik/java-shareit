@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
@@ -12,7 +11,6 @@ import ru.practicum.shareit.item.dto.CommentWithAuthorAndItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.CommentMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
@@ -26,6 +24,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.booking.model.BookingMapper.toBookingDto;
+import static ru.practicum.shareit.item.model.CommentMapper.toComment;
+import static ru.practicum.shareit.item.model.CommentMapper.toCommentWithAuthorAndItemDto;
 import static ru.practicum.shareit.item.model.ItemMapper.*;
 
 @Service
@@ -36,9 +37,6 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
-
-    private final CommentMapper commentMapper;
-    private final BookingMapper bookingMapper;
 
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) throws NotFoundParameterException {
@@ -108,8 +106,8 @@ public class ItemServiceImpl implements ItemService {
         commentDto.setItemId(itemId);
         commentDto.setCreated(LocalDate.now());
 
-        CommentWithAuthorAndItemDto comment = commentMapper.toCommentWithAuthorAndItemDto(
-                commentRepository.save(commentMapper.toComment(commentDto))
+        CommentWithAuthorAndItemDto comment = toCommentWithAuthorAndItemDto(
+                commentRepository.save(toComment(commentDto))
         );
 
         comment.setAuthorName(userRepository.getReferenceById(commentDto.getAuthorId()).getName());
@@ -159,7 +157,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
 
         if (lastBookings.size() != 0)
-            itemDtoWithBooking.setLastBooking(bookingMapper.toBookingDto(lastBookings.get(0)));
+            itemDtoWithBooking.setLastBooking(toBookingDto(lastBookings.get(0)));
 
         List<Booking> nextBookings = bookingRepository.findAllByItemIdAndStartIsAfterOrderByStartAsc(
                         item.getId(), LocalDateTime.now())
@@ -168,20 +166,18 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
 
         if (nextBookings.size() != 0)
-            itemDtoWithBooking.setNextBooking(bookingMapper.toBookingDto(nextBookings.get(0)));
+            itemDtoWithBooking.setNextBooking(toBookingDto(nextBookings.get(0)));
 
         return itemDtoWithBooking;
 
     }
 
     private ItemWithBookingDto addCommentsForItem(ItemWithBookingDto item) {
-//        List<CommentDtoWithAuthorAndItem> commentDtoWithAuthorAndItemList = commentRepository.findAllByItem(item.getId())
-//                .stream().
 
         List<CommentWithAuthorAndItemDto> commentWithAuthorAndItemListDto = new ArrayList<>();
 
         for (Comment comment : commentRepository.findAllByItem(item.getId())) {
-            CommentWithAuthorAndItemDto commentWithAuthorAndItemDto = commentMapper.toCommentWithAuthorAndItemDto(comment);
+            CommentWithAuthorAndItemDto commentWithAuthorAndItemDto = toCommentWithAuthorAndItemDto(comment);
             commentWithAuthorAndItemDto.setAuthorName(userRepository.getReferenceById(comment.getAuthor()).getName());
             commentWithAuthorAndItemListDto.add(commentWithAuthorAndItemDto);
         }

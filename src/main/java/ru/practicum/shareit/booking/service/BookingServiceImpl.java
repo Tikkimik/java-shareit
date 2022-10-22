@@ -12,9 +12,7 @@ import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.IncorrectStatusException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -22,6 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.booking.model.BookingMapper.*;
+import static ru.practicum.shareit.item.model.ItemMapper.toItemDto;
+import static ru.practicum.shareit.user.model.UserMapper.toUserDto;
 
 @Service
 @RequiredArgsConstructor
@@ -31,17 +33,12 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
-    private final BookingMapper bookingMapper;
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
-
-
     @Override
     public BookingWithItemAndUserDto getBooking(Long userId, Long bookingId) throws NotFoundParameterException {
         checkUserById(userId);
         checkBookingById(bookingId);
 
-        BookingDto bookingDto = bookingMapper.toBookingDto(bookingRepository.getReferenceById(bookingId));
+        BookingDto bookingDto = toBookingDto(bookingRepository.getReferenceById(bookingId));
 
         Item item = itemRepository.getReferenceById(bookingDto.getItemId());
 
@@ -68,7 +65,7 @@ public class BookingServiceImpl implements BookingService {
         bookingDto.setStatus(BookingStatus.WAITING);
         bookingDto.setBookerId(userId);
 
-        bookingRepository.save(bookingMapper.toBooking(bookingDto));
+        bookingRepository.save(toBooking(bookingDto));
 
         return getBookingWithItemAndUserDto(bookingDto);
     }
@@ -93,7 +90,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingRepository.save(booking);
-        BookingDto bookingDto = bookingMapper.toBookingDto(booking);
+        BookingDto bookingDto = toBookingDto(booking);
         return getBookingWithItemAndUserDto(bookingDto);
     }
 
@@ -201,8 +198,8 @@ public class BookingServiceImpl implements BookingService {
 
     private BookingWithItemAndUserDto getBookingWithItemAndUserDto(BookingDto bookingDto) {
 
-        BookingWithItemAndUserDto bookingWithItemAndUserDto = bookingMapper.toBookingWithItemAndUserDto(
-                bookingMapper.toBookingDto(bookingRepository.findBookingByStartAndEndAndBookerIdAndItemId(
+        BookingWithItemAndUserDto bookingWithItemAndUserDto = toBookingWithItemAndUserDto(
+                toBookingDto(bookingRepository.findBookingByStartAndEndAndBookerIdAndItemId(
                         bookingDto.getStart(),
                         bookingDto.getEnd(),
                         bookingDto.getBookerId(),
@@ -210,8 +207,8 @@ public class BookingServiceImpl implements BookingService {
                 )
         );
 
-        bookingWithItemAndUserDto.setBooker(userMapper.toUserDto(userRepository.getReferenceById(bookingDto.getBookerId())));
-        bookingWithItemAndUserDto.setItem(itemMapper.toItemDto(itemRepository.getReferenceById(bookingDto.getItemId())));
+        bookingWithItemAndUserDto.setBooker(toUserDto(userRepository.getReferenceById(bookingDto.getBookerId())));
+        bookingWithItemAndUserDto.setItem(toItemDto(itemRepository.getReferenceById(bookingDto.getItemId())));
 
         return bookingWithItemAndUserDto;
     }
@@ -219,7 +216,7 @@ public class BookingServiceImpl implements BookingService {
     private List<BookingWithItemAndUserDto> listOfBookingWithItemAndUserDto(List<Booking> bookings) {
         return bookings
                 .stream()
-                .map(bookingMapper::toBookingDto)
+                .map(BookingMapper::toBookingDto)
                 .map(this::getBookingWithItemAndUserDto)
                 .collect(Collectors.toList());
     }
