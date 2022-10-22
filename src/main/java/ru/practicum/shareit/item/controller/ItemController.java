@@ -1,9 +1,8 @@
 package ru.practicum.shareit.item.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.helpers.Create;
 import ru.practicum.shareit.helpers.Update;
@@ -17,10 +16,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/items")
+@RequiredArgsConstructor
 public class ItemController {
 
-    @Autowired
-    private ItemServiceImpl itemService;
+    private final ItemServiceImpl itemService;
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
@@ -52,7 +51,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentWithAuthorAndItemDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
-                                                  @RequestBody CommentDto commentDto) throws CreatingException {
+                                                  @RequestBody CommentDto commentDto) {
         return itemService.addComment(userId, itemId, commentDto);
     }
 

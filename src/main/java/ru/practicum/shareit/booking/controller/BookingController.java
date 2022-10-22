@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingWithItemAndUserDto;
@@ -12,11 +12,11 @@ import java.util.List;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
+    private final BookingService bookingService;
 
     @GetMapping("/{bookingId}")
     public BookingWithItemAndUserDto getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
