@@ -56,8 +56,6 @@ public class ItemServiceImpl implements ItemService {
 
         ItemDto itemFromRepository = toItemDto(itemRepository.getReferenceById(itemId));
 
-     //   if (itemFromRepository == null) throw new NotFoundParameterException("Exception: Item not found");
-
         if (itemDto.getName() != null) itemFromRepository.setName(itemDto.getName());
 
         if (itemDto.getDescription() != null) itemFromRepository.setDescription(itemDto.getDescription());
