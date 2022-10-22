@@ -49,5 +49,5 @@ CREATE TABLE IF NOT EXISTS comments (
     author_id  BIGINT NOT NULL,
     created    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT FK_COMMENTS_TO_USERS FOREIGN KEY(author_id) REFERENCES users(user_id),
-    CONSTRAINT fk_comments_to_items FOREIGN KEY(item_id) REFERENCES items(item_id)
+    CONSTRAINT FK_COMMENTS_TO_ITEMS FOREIGN KEY(item_id) REFERENCES items(item_id)
 );

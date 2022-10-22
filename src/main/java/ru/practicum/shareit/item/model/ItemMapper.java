@@ -8,13 +8,20 @@ import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 public class ItemMapper {
 
     public static Item toItem(ItemDto itemDto) {
-        return new Item(itemDto.getId(), itemDto.getName(), itemDto.getDescription(),
-                itemDto.getAvailable(), itemDto.getOwner(), itemDto.getRequest());
+        Item item = new Item();
+        item.setName(itemDto.getName());
+        item.setAvailable(itemDto.getAvailable());
+        item.setDescription(itemDto.getDescription());
+        return item;
     }
 
     public static ItemDto toItemDto(Item item) {
-        return new ItemDto(item.getId(), item.getName(), item.getDescription(),
-                item.getAvailable(), item.getOwner(), item.getRequest());
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(item.getId());
+        itemDto.setName(item.getName());
+        itemDto.setDescription(item.getDescription());
+        itemDto.setAvailable(item.getAvailable());
+        return itemDto;
     }
 
     public static ItemWithBookingDto toItemWithBookingDto(Item item) {

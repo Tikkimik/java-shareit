@@ -1,14 +1,13 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "items")
 public class Item {
@@ -27,9 +26,11 @@ public class Item {
     @Column(name = "item_is_available", nullable = false)
     private Boolean available;
 
-    @Column(name = "item_owner_id", nullable = false)
-    private Long owner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_owner_id")
+    private User owner;
 
     @Column(name = "item_request_id", nullable = false)
     private Long request;
+
 }

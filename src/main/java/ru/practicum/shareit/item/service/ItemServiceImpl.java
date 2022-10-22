@@ -40,28 +40,28 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) throws NotFoundParameterException {
-        checkUserId(userId);
-        checkItem(itemDto);
-        itemDto.setOwner(userId);
-        return toItemDto(itemRepository.save(toItem(itemDto)));
+        Item item = toItem(itemDto);
+
+        item.setOwner(userRepository.findById(userId).orElseThrow(() ->
+            new NotFoundParameterException("Exception: Wrong item id.")));
+
+        return toItemDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws NotFoundParameterException {
+        checkItemId(userId);
 
-        if (!Objects.equals(getItem(userId, itemId).getOwner(), userId))
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+            new NotFoundParameterException("Exception: Wrong item id."));
+
+        if (!item.getOwner().getId().equals(userId))
             throw new NotFoundParameterException("Exception: You must be the owner of an item to upgrade it.");
 
-        ItemDto itemFromRepository = toItemDto(itemRepository.getReferenceById(itemId));
-
-        if (itemDto.getName() != null) itemFromRepository.setName(itemDto.getName());
-
-        if (itemDto.getDescription() != null) itemFromRepository.setDescription(itemDto.getDescription());
-
-        if (itemDto.getAvailable() != null) itemFromRepository.setAvailable(itemDto.getAvailable());
-
-        itemRepository.save(toItem(itemFromRepository));
-        return itemFromRepository;
+        if (itemDto.getName() != null) item.setName(itemDto.getName());
+        if (itemDto.getDescription() != null) item.setDescription(itemDto.getDescription());
+        if (itemDto.getAvailable() != null) item.setAvailable(itemDto.getAvailable());
+        return toItemDto(itemRepository.save(item));
     }
 
     @Override
@@ -145,6 +145,8 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundParameterException("Exception: Wrong user id.");
 
     }
+
+
 
     private ItemWithBookingDto setBookingsForItem(Item item, Long userId) {
 
