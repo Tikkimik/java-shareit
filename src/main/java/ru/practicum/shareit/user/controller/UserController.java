@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.helpers.Create;
 import ru.practicum.shareit.helpers.Update;
@@ -10,6 +11,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Validated
 @RestController
@@ -21,12 +24,14 @@ public class UserController {
 
     @PostMapping
     public UserDto createUser(@Validated({Create.class}) @RequestBody UserDto userDto) {
+        checkUserEmail(userDto);
         return userService.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@PathVariable Long userId,
                           @Validated({Update.class}) @RequestBody UserDto userDto) throws NotFoundParameterException {
+        if (userDto.getEmail() != null) checkUserEmail(userDto);
         return userService.updateUser(userId, userDto);
     }
 
@@ -36,12 +41,24 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) throws NotFoundParameterException {
-        return userService.getUser(userId);
+    public UserDto findById(@PathVariable Long userId) throws NotFoundParameterException {
+        return userService.findById(userId);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId) throws NotFoundParameterException {
+    public void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
+    }
+
+    private void checkUserEmail(UserDto userDto) throws IncorrectParameterException {
+
+        if (userDto.getEmail() == null)
+            throw new IncorrectParameterException("Exception: Email address cannot be null");
+
+        Pattern pattern = Pattern.compile("^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+        Matcher matcher = pattern.matcher(userDto.getEmail());
+
+        if (!matcher.matches())
+            throw new IncorrectParameterException("Exception: email address not verified.");
     }
 }

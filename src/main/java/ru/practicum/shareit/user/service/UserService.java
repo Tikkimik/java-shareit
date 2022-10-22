@@ -14,7 +14,7 @@ public interface UserService {
 
     List<UserDto> getAllUsers();
 
-    UserDto getUser(Long userId) throws NotFoundParameterException;
+    UserDto findById(Long userId) throws NotFoundParameterException;
 
     void deleteUser(Long userId) throws NotFoundParameterException;
 
