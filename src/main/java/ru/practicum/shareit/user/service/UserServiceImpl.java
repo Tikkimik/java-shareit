@@ -26,9 +26,8 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
 
         checkUserEmail(userDto);
-        userRepository.save(toUser(userDto));
-        return toUserDto(userRepository.getUserByEmail(userDto.getEmail()));
 
+        return toUserDto(userRepository.save(toUser(userDto)));
     }
 
     @Override
