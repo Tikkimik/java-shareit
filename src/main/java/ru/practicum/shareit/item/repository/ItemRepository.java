@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query("SELECT i " +
-            "FROM Item i " +
-            "WHERE (LOWER(i.name) LIKE %:text% OR LOWER(i.description) LIKE %:text%) AND i.available = true")
+    @Query("SELECT item " +
+            "FROM Item item " +
+            "WHERE (LOWER(item.name) LIKE %:text% " +
+            "OR LOWER(item.description) LIKE %:text%) " +
+            "AND item.available = true")
     List<Item> search(String text);
 
 

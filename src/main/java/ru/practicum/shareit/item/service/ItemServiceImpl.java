@@ -64,15 +64,6 @@ public class ItemServiceImpl implements ItemService {
         return toItemDto(itemRepository.save(item));
     }
 
-//    @Override
-//    public List<ItemWithBookingDto> getAllByUserId(Long userId) {
-//        return itemRepository.findAllByOwnerOrderById(userId)
-//                .stream()
-//                .map(item -> setBookingsForItem(item, userId))
-//                .map(this::addCommentsForItem)
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public List<ItemWithBookingDto> getAllByUserId(Long userId) {
         return itemRepository.findAllById(userId)
@@ -84,12 +75,6 @@ public class ItemServiceImpl implements ItemService {
                 )
                 .collect(Collectors.toList());
     }
-
-//    @Override
-//    public ItemWithBookingDto getItem(Long userId, Long itemId) throws NotFoundParameterException {
-//        checkItemId(itemId);
-//        return addCommentsForItem(setBookingsForItem(itemRepository.getReferenceById(itemId), userId));
-//    }
 
     @Override
     public ItemWithBookingDto getItem(Long userId, Long itemId) throws NotFoundParameterException {
@@ -114,31 +99,8 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList()
-        );
+                );
     }
-
-
-//    @Override
-//    public CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) {
-//        if (commentDto.getText().isEmpty()) throw new IncorrectParameterException("Exception: Comment is empty.");
-//
-//        List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStartBefore(
-//                itemId, userId, LocalDateTime.now()
-//        );
-//
-//        if (bookings.size() < 1) throw new IncorrectParameterException("Exception: Can't comment on it.");
-//
-//        commentDto.setAuthorId(userId);
-//        commentDto.setItemId(itemId);
-//        commentDto.setCreated(LocalDate.now());
-//
-//        CommentWithAuthorAndItemDto comment = toCommentWithAuthorAndItemDto(
-//                commentRepository.save(toComment(commentDto))
-//        );
-//
-//        comment.setAuthorName(userRepository.getReferenceById(commentDto.getAuthorId()).getName());
-//        return comment;
-//    }
 
     @Override
     public CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) {
@@ -148,11 +110,11 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new IncorrectParameterException("Exception: Wrong item id."));
 
-        if(!bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now()))
-                throw new IncorrectParameterException("The user has not used this item yet");
+        if (!bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now()))
+            throw new IncorrectParameterException("The user has not used this item yet");
 
-        if(Objects.equals(commentDto.getText(), ""))
-                throw new IncorrectParameterException("Exception: Comment cannot be empty");
+        if (Objects.equals(commentDto.getText(), ""))
+            throw new IncorrectParameterException("Exception: Comment cannot be empty");
 
         Comment comment = toComment(commentDto, user, item);
         return toCommentWithAuthorAndItemDto(commentRepository.save(comment));

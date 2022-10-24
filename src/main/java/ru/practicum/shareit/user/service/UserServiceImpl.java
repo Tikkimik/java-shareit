@@ -49,8 +49,8 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundParameterException("Exception: Wrong user id."));
 
-        if(userDto.getName() != null) updatedUser.setName(userDto.getName());
-        if(userDto.getEmail() != null) updatedUser.setEmail(userDto.getEmail());
+        if (userDto.getName() != null) updatedUser.setName(userDto.getName());
+        if (userDto.getEmail() != null) updatedUser.setEmail(userDto.getEmail());
         return toUserDto(userRepository.save(updatedUser));
     }
 }

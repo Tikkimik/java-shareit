@@ -31,14 +31,12 @@ public class ItemMapper {
     }
 
     public static ItemWithBookingDto toItemWithBookingDto(
-        Item item, Booking nextBooking, Booking lastBooking, List<Comment> comments) {
+            Item item, Booking nextBooking, Booking lastBooking, List<Comment> comments) {
         return new ItemWithBookingDto(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-//                item.getOwner(),
-//                item.getRequest(),
                 createBookingItemDto(nextBooking),
                 createBookingItemDto(lastBooking),
                 toCommentWithAuthorAndItemDto(comments)
