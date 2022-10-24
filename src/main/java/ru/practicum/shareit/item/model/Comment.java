@@ -1,15 +1,18 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
@@ -22,13 +25,15 @@ public class Comment {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @Column(name = "item_id", nullable = false)
-    private Long item;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @Column(name = "author_id", nullable = false)
-    private Long author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
 
     @Column(name = "created", nullable = false)
-    private LocalDate created;
+    private LocalDateTime created;
 
 }

@@ -19,7 +19,7 @@ public interface ItemService {
 
     ItemWithBookingDto getItem(Long userId, Long itemId) throws NotFoundParameterException;
 
-    List<ItemDto> searchAvailableItem(String text);
+    List<ItemDto> searchAvailableItem(String text) throws NotFoundParameterException;
 
     CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) throws CreatingException;
 

@@ -1,32 +1,48 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.user.model.User;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.practicum.shareit.booking.model.Booking;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class ItemWithBookingDto {
-    private long id;
+    private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private User owner;
-    private Long request;
-    private BookingDto nextBooking;
-    private BookingDto lastBooking;
+    private BookingBookerDto nextBooking;
+    private BookingBookerDto lastBooking;
     private List<CommentWithAuthorAndItemDto> comments;
 
-    public ItemWithBookingDto(Long id, String name, String description, Boolean available, User owner, Long request) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-        this.owner = owner;
-        this.request = request;
-    }
 
+    public static class BookingBookerDto {
+        private final Long id;
+        private final Long bookerId;
+
+        private BookingBookerDto(Long id, Long bookerId) {
+            this.id = id;
+            this.bookerId = bookerId;
+        }
+
+        public static BookingBookerDto createBookingItemDto(Booking booking) {
+            if (booking == null) return null;
+
+            return new BookingBookerDto(booking.getId(), booking.getBooker().getId());
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public Long getBookerId() {
+            return bookerId;
+        }
+    }
 }

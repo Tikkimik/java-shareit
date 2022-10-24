@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(Long userId, UserDto userDto) throws NotFoundParameterException {
         User updatedUser = userRepository.findById(userId).orElseThrow(() ->
-            new NotFoundParameterException("Exception: Wrong user id."));
+                new NotFoundParameterException("Exception: Wrong user id."));
 
         if (userDto.getName() != null) updatedUser.setName(userDto.getName());
         if (userDto.getEmail() != null) updatedUser.setEmail(userDto.getEmail());

@@ -1,25 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CommentWithAuthorAndItemDto {
-    private long id;
+    private Long id;
     private String text;
-    private long itemId;
     private String authorName;
-    private LocalDate created;
-
-    public CommentWithAuthorAndItemDto(long id, String text, long itemId, LocalDate created) {
-        this.id = id;
-        this.text = text;
-        this.itemId = itemId;
-        this.created = created;
-    }
+    private LocalDateTime created;
 }

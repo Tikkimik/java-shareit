@@ -1,27 +1,53 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
-@Data
+
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class BookingWithItemAndUserDto {
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private ItemDto item;
-    private UserDto booker;
+    private ItemInfoDto item;
+    private UserInfoDto booker;
     private BookingStatus status;
 
-    public BookingWithItemAndUserDto(Long id, LocalDateTime start, LocalDateTime end, BookingStatus status) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.status = status;
+    public static class UserInfoDto {
+        private final Long id;
+
+        public UserInfoDto(Long id) {
+            this.id = id;
+        }
+
+        public Long getId() {
+            return id;
+        }
+    }
+
+    public static class ItemInfoDto {
+        private final Long id;
+        private final String name;
+
+        public ItemInfoDto(Long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

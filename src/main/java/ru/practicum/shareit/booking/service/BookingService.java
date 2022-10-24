@@ -9,14 +9,14 @@ import java.util.List;
 
 public interface BookingService {
 
-    BookingWithItemAndUserDto getBooking(Long userId, Long bookingId) throws NotFoundParameterException, CreatingException;
+    BookingWithItemAndUserDto getById(Long userId, Long bookingId) throws NotFoundParameterException, CreatingException;
 
-    List<BookingWithItemAndUserDto> getAllBookings(Long userId, String state) throws NotFoundParameterException;
+    List<BookingWithItemAndUserDto> getBookingByBooker(Long userId, String state) throws NotFoundParameterException;
 
-    List<BookingWithItemAndUserDto> getAllByOwner(Long userId, String state) throws NotFoundParameterException;
+    List<BookingWithItemAndUserDto> getBookingByItemOwner(Long userId, String state) throws NotFoundParameterException;
 
-    BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException, CreatingException;
+    BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException;
 
-    BookingWithItemAndUserDto approve(Long userId, Long bookingId, boolean approved) throws NotFoundParameterException;
+    BookingWithItemAndUserDto approve(Long userId, Long bookingId, Boolean approved) throws NotFoundParameterException, CreatingException;
 
 }

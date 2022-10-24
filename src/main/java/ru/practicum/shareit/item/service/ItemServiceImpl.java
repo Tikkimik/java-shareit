@@ -15,16 +15,15 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.model.BookingMapper.toBookingDto;
 import static ru.practicum.shareit.item.model.CommentMapper.toComment;
 import static ru.practicum.shareit.item.model.CommentMapper.toCommentWithAuthorAndItemDto;
 import static ru.practicum.shareit.item.model.ItemMapper.*;
@@ -43,17 +42,18 @@ public class ItemServiceImpl implements ItemService {
         Item item = toItem(itemDto);
 
         item.setOwner(userRepository.findById(userId).orElseThrow(() ->
-            new NotFoundParameterException("Exception: Wrong item id.")));
+                new NotFoundParameterException("Exception: Wrong item id.")));
 
         return toItemDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws NotFoundParameterException {
-        checkItemId(userId);
+        if (!userRepository.existsById(userId))
+            throw new NotFoundParameterException("Exception: Wrong user id.");
 
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
-            new NotFoundParameterException("Exception: Wrong item id."));
+                new NotFoundParameterException("Exception: Wrong item id."));
 
         if (!item.getOwner().getId().equals(userId))
             throw new NotFoundParameterException("Exception: You must be the owner of an item to upgrade it.");
@@ -64,127 +64,102 @@ public class ItemServiceImpl implements ItemService {
         return toItemDto(itemRepository.save(item));
     }
 
+//    @Override
+//    public List<ItemWithBookingDto> getAllByUserId(Long userId) {
+//        return itemRepository.findAllByOwnerOrderById(userId)
+//                .stream()
+//                .map(item -> setBookingsForItem(item, userId))
+//                .map(this::addCommentsForItem)
+//                .collect(Collectors.toList());
+//    }
+
     @Override
     public List<ItemWithBookingDto> getAllByUserId(Long userId) {
-        return itemRepository.findAllByOwnerOrderById(userId)
+        return itemRepository.findAllById(userId)
                 .stream()
-                .map(item -> setBookingsForItem(item, userId))
-                .map(this::addCommentsForItem)
+                .map(item -> toItemWithBookingDto(item,
+                        bookingRepository.findNextBooking(LocalDateTime.now(), userId, item.getId()),
+                        bookingRepository.findLastBooking(LocalDateTime.now(), userId, item.getId()),
+                        commentRepository.findCommentsByItemId(item.getId()))
+                )
                 .collect(Collectors.toList());
     }
 
+//    @Override
+//    public ItemWithBookingDto getItem(Long userId, Long itemId) throws NotFoundParameterException {
+//        checkItemId(itemId);
+//        return addCommentsForItem(setBookingsForItem(itemRepository.getReferenceById(itemId), userId));
+//    }
+
     @Override
     public ItemWithBookingDto getItem(Long userId, Long itemId) throws NotFoundParameterException {
-        checkItemId(itemId);
-        return addCommentsForItem(setBookingsForItem(itemRepository.getReferenceById(itemId), userId));
+        if (!userRepository.existsById(userId))
+            throw new NotFoundParameterException("Exception: Wrong user id.");
+
+        Item item = itemRepository.findById(itemId).orElseThrow(()
+                -> new NotFoundParameterException("Exception: Wrong item id."));
+
+        Booking lastBooking = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId);
+        Booking nextBooking = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId);
+        List<Comment> comments = commentRepository.findCommentsByItemId(itemId);
+        return toItemWithBookingDto(item, nextBooking, lastBooking, comments);
     }
 
     @Override
     public List<ItemDto> searchAvailableItem(String text) {
 
-        if (text.isEmpty()) return new ArrayList<>();
+        if (text.isBlank()) return new ArrayList<>();
 
-        return itemRepository.findAll()
+        return itemRepository.search(text.toLowerCase())
                 .stream()
-                .filter(item -> item.getAvailable().equals(true))
-                .filter(item -> item.getDescription().toLowerCase().contains(text.toLowerCase()))
                 .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()
+        );
     }
+
+
+//    @Override
+//    public CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) {
+//        if (commentDto.getText().isEmpty()) throw new IncorrectParameterException("Exception: Comment is empty.");
+//
+//        List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStartBefore(
+//                itemId, userId, LocalDateTime.now()
+//        );
+//
+//        if (bookings.size() < 1) throw new IncorrectParameterException("Exception: Can't comment on it.");
+//
+//        commentDto.setAuthorId(userId);
+//        commentDto.setItemId(itemId);
+//        commentDto.setCreated(LocalDate.now());
+//
+//        CommentWithAuthorAndItemDto comment = toCommentWithAuthorAndItemDto(
+//                commentRepository.save(toComment(commentDto))
+//        );
+//
+//        comment.setAuthorName(userRepository.getReferenceById(commentDto.getAuthorId()).getName());
+//        return comment;
+//    }
 
     @Override
     public CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) {
-        if (commentDto.getText().isEmpty()) throw new IncorrectParameterException("Exception: Comment is empty.");
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new IncorrectParameterException("Exception: Wrong user id."));
 
-        List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStartBefore(
-                itemId, userId, LocalDateTime.now()
-        );
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new IncorrectParameterException("Exception: Wrong item id."));
 
-        if (bookings.size() < 1) throw new IncorrectParameterException("Exception: Can't comment on it.");
+        if(!bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now()))
+                throw new IncorrectParameterException("The user has not used this item yet");
 
-        commentDto.setAuthorId(userId);
-        commentDto.setItemId(itemId);
-        commentDto.setCreated(LocalDate.now());
+        if(Objects.equals(commentDto.getText(), ""))
+                throw new IncorrectParameterException("Exception: Comment cannot be empty");
 
-        CommentWithAuthorAndItemDto comment = toCommentWithAuthorAndItemDto(
-                commentRepository.save(toComment(commentDto))
-        );
-
-        comment.setAuthorName(userRepository.getReferenceById(commentDto.getAuthorId()).getName());
-        return comment;
+        Comment comment = toComment(commentDto, user, item);
+        return toCommentWithAuthorAndItemDto(commentRepository.save(comment));
     }
 
     @Override
     public void delete(Long userId, Long itemId) {
         itemRepository.deleteById(itemId);
-    }
-
-    private void checkItem(ItemDto itemDto) {
-
-        if (itemDto.getName().isEmpty())
-            throw new IncorrectParameterException("Exception: Item name cannot be null.");
-
-        if (itemDto.getDescription() == null || Objects.equals(itemDto.getDescription(), ""))
-            throw new IncorrectParameterException("Exception: Item description cannot be empty.");
-
-        if (!itemDto.getAvailable())
-            throw new IncorrectParameterException("Exception: Item cannot be unavailable.");
-
-    }
-
-    private void checkItemId(Long id) throws NotFoundParameterException {
-
-        if (!itemRepository.existsById(id))
-            throw new NotFoundParameterException("Exception: Wrong item id.");
-
-    }
-
-    private void checkUserId(Long id) throws NotFoundParameterException {
-
-        if (!userRepository.existsById(id))
-            throw new NotFoundParameterException("Exception: Wrong user id.");
-
-    }
-
-
-
-    private ItemWithBookingDto setBookingsForItem(Item item, Long userId) {
-
-        ItemWithBookingDto itemDtoWithBooking = toItemWithBookingDto(item);
-
-        List<Booking> lastBookings = bookingRepository.findAllByItemIdAndStartIsBeforeOrderByStartDesc(
-                        item.getId(), LocalDateTime.now())
-                .stream()
-                .filter(booking -> !Objects.equals(booking.getBookerId(), userId))
-                .collect(Collectors.toList());
-
-        if (lastBookings.size() != 0)
-            itemDtoWithBooking.setLastBooking(toBookingDto(lastBookings.get(0)));
-
-        List<Booking> nextBookings = bookingRepository.findAllByItemIdAndStartIsAfterOrderByStartAsc(
-                        item.getId(), LocalDateTime.now())
-                .stream()
-                .filter(booking -> !Objects.equals(booking.getBookerId(), userId))
-                .collect(Collectors.toList());
-
-        if (nextBookings.size() != 0)
-            itemDtoWithBooking.setNextBooking(toBookingDto(nextBookings.get(0)));
-
-        return itemDtoWithBooking;
-
-    }
-
-    private ItemWithBookingDto addCommentsForItem(ItemWithBookingDto item) {
-
-        List<CommentWithAuthorAndItemDto> commentWithAuthorAndItemListDto = new ArrayList<>();
-
-        for (Comment comment : commentRepository.findAllByItem(item.getId())) {
-            CommentWithAuthorAndItemDto commentWithAuthorAndItemDto = toCommentWithAuthorAndItemDto(comment);
-            commentWithAuthorAndItemDto.setAuthorName(userRepository.getReferenceById(comment.getAuthor()).getName());
-            commentWithAuthorAndItemListDto.add(commentWithAuthorAndItemDto);
-        }
-
-        item.setComments(commentWithAuthorAndItemListDto);
-        return item;
     }
 }

@@ -19,21 +19,21 @@ public class BookingController {
     private final BookingService bookingService;
 
     @GetMapping("/{bookingId}")
-    public BookingWithItemAndUserDto getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                @PathVariable Long bookingId) throws NotFoundParameterException, CreatingException {
-        return bookingService.getBooking(userId, bookingId);
+    public BookingWithItemAndUserDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                             @PathVariable Long bookingId) throws NotFoundParameterException, CreatingException {
+        return bookingService.getById(userId, bookingId);
     }
 
     @GetMapping
-    public List<BookingWithItemAndUserDto> getAllBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                          @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
-        return bookingService.getAllBookings(userId, state);
+    public List<BookingWithItemAndUserDto> getBookingByBooker(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                              @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
+        return bookingService.getBookingByBooker(userId, state);
     }
 
     @GetMapping("/owner")
-    public List<BookingWithItemAndUserDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                         @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
-        return bookingService.getAllByOwner(userId, state);
+    public List<BookingWithItemAndUserDto> getBookingByItemOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                                 @RequestParam(required = false, defaultValue = "ALL") String state) throws NotFoundParameterException {
+        return bookingService.getBookingByItemOwner(userId, state);
     }
 
     @PostMapping
@@ -45,7 +45,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingWithItemAndUserDto approve(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable Long bookingId,
-                                             @RequestParam boolean approved) throws NotFoundParameterException {
+                                             @RequestParam Boolean approved) throws NotFoundParameterException, CreatingException {
         return bookingService.approve(userId, bookingId, approved);
     }
 }

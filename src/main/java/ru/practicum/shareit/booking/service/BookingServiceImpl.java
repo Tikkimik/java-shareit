@@ -13,17 +13,15 @@ import ru.practicum.shareit.exceptions.IncorrectStatusException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.model.BookingMapper.*;
-import static ru.practicum.shareit.item.model.ItemMapper.toItemDto;
-import static ru.practicum.shareit.user.model.UserMapper.toUserDto;
+import static ru.practicum.shareit.booking.model.BookingMapper.toBooking;
+import static ru.practicum.shareit.booking.model.BookingMapper.toBookingWithItemAndUserDto;
 
 @Service
 @RequiredArgsConstructor
@@ -34,54 +32,68 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
-    public BookingWithItemAndUserDto getBooking(Long userId, Long bookingId) throws NotFoundParameterException {
-        checkUserById(userId);
-        checkBookingById(bookingId);
+    public BookingWithItemAndUserDto getById(Long userId, Long bookingId) throws NotFoundParameterException {
 
-        BookingDto bookingDto = toBookingDto(bookingRepository.getReferenceById(bookingId));
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
+                new NotFoundParameterException("Exception: booking not found."));
 
-        Item item = itemRepository.getReferenceById(bookingDto.getItemId());
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
+                new NotFoundParameterException("Exception: booking item not found."));
 
-        if (!Objects.equals(bookingDto.getBookerId(), userId) && !Objects.equals(item.getOwner(), userId))
-            throw new NotFoundParameterException(String.format(
-                    "Exception: Wrong user id = \"%s\", booker id = \"%b\".", userId, bookingDto.getBookerId()
-            ));
+        User user = userRepository.findById(booking.getBooker().getId()).orElseThrow(() ->
+                new NotFoundParameterException("Exception: booker not found."));
 
-        checkBookingTimings(bookingDto);
-        checkItem(bookingDto.getItemId());
+        if (!(user.getId().equals(userId) || item.getOwner().getId().equals(userId)))
+            throw new NotFoundParameterException("Exception: booking user not found.");
 
-        return getBookingWithItemAndUserDto(bookingDto);
+        return toBookingWithItemAndUserDto(booking);
     }
 
     @Override
     public BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException {
-        checkUserById(userId);
-        checkBookingTimings(bookingDto);
-        checkItem(bookingDto.getItemId());
 
-        Item item = itemRepository.getReferenceById(bookingDto.getItemId());
-        checkOwner(item, userId);
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
+            throw new IncorrectParameterException("Booking time is incorrect");
 
-        bookingDto.setStatus(BookingStatus.WAITING);
-        bookingDto.setBookerId(userId);
+        if (bookingDto.getStart().isBefore(LocalDateTime.now()))
+            throw new IncorrectParameterException("Booking time is incorrect");
 
-        bookingRepository.save(toBooking(bookingDto));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("User doesn't exists"));
 
-        return getBookingWithItemAndUserDto(bookingDto);
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
+                new NotFoundParameterException("Item doesn't exists"));
+
+        if (item.getAvailable().equals(false))
+            throw new IncorrectParameterException("Item is not available");
+
+        if (item.getOwner().equals(user))
+            throw new NotFoundParameterException("Item has another owner");
+
+        Booking booking = toBooking(bookingDto, user, item, BookingStatus.WAITING);
+
+        return toBookingWithItemAndUserDto(bookingRepository.save(booking));
     }
 
     @Override
-    public BookingWithItemAndUserDto approve(Long userId, Long bookingId, boolean approved) throws NotFoundParameterException {
-        Booking booking = bookingRepository.getReferenceById(bookingId);
+    public BookingWithItemAndUserDto approve(Long userId, Long bookingId, Boolean approved) throws NotFoundParameterException {
+
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
+                new NotFoundParameterException("Booking info not found"));
 
         if (booking.getStatus().equals(BookingStatus.APPROVED))
             throw new IncorrectParameterException(String.format(
                     "Exception: Wrong booking status \"%s\".", booking.getStatus()
             ));
 
-        Item item = itemRepository.getReferenceById(booking.getItemId());
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("User doesn't exists"));
 
-        checkNotOwner(item, userId);
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
+                new NotFoundParameterException("Item doesn't exists"));
+
+        if (!item.getOwner().equals(user))
+            throw new NotFoundParameterException("User's booking information was not found");
 
         if (approved) {
             booking.setStatus(BookingStatus.APPROVED);
@@ -89,135 +101,98 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(BookingStatus.REJECTED);
         }
 
-        bookingRepository.save(booking);
-        BookingDto bookingDto = toBookingDto(booking);
-        return getBookingWithItemAndUserDto(bookingDto);
+        return toBookingWithItemAndUserDto(bookingRepository.save(booking));
     }
 
     @Override
-    public List<BookingWithItemAndUserDto> getAllBookings(Long userId, String state) throws NotFoundParameterException {
-        checkUserById(userId);
+    public List<BookingWithItemAndUserDto> getBookingByBooker(Long userId, String state) throws NotFoundParameterException {
 
-        if (state.equals("ALL")) {
-            return listOfBookingWithItemAndUserDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("User doesn't exists"));
+
+        BookingStatus bookingStatus = BookingStatus.checkBookingStatus(state);
+
+        switch (bookingStatus) {
+            case ALL:
+                return bookingRepository.findBookingsByBookerIdOrderByStartDesc(userId)
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case WAITING:
+
+            case REJECTED:
+                return bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, bookingStatus)
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case PAST:
+                return bookingRepository.findBookingsByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now())
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case CURRENT:
+                return bookingRepository.findBookingBookerByCurrentState(userId, LocalDateTime.now())
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case FUTURE:
+                return bookingRepository.findBookingsByBookerIdAndEndAfterOrderByStartDesc(userId, LocalDateTime.now())
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            default:
+                throw new IncorrectStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
-
-        return listOfBookingWithItemAndUserDto(checkStatus(new ArrayList<>(
-                bookingRepository.findAllByBookerIdOrderByStartDesc(userId)), state)
-        );
     }
 
     @Override
-    public List<BookingWithItemAndUserDto> getAllByOwner(Long userId, String state) throws NotFoundParameterException {
-        checkUserById(userId);
+    public List<BookingWithItemAndUserDto> getBookingByItemOwner(Long userId, String state) throws NotFoundParameterException {
 
-        List<Item> items = itemRepository.findAllByOwnerOrderById(userId);
-        List<Booking> bookings = new ArrayList<>();
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("User doesn't exists"));
 
-        for (Item i : items) {
-            bookings.addAll(bookingRepository.findAllByItemIdOrderByStartDesc(i.getId()));
+        BookingStatus bookingStatus = BookingStatus.checkBookingStatus(state);
+
+        switch (bookingStatus) {
+            case ALL:
+                return bookingRepository.findBookingsByItemOwnerIdOrderByStartDesc(userId)
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case WAITING:
+
+            case REJECTED:
+                return bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, bookingStatus)
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case PAST:
+                return bookingRepository.findBookingsByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now())
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case CURRENT:
+                return bookingRepository.findBookingOwnerByCurrentState(userId, LocalDateTime.now())
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            case FUTURE:
+                return bookingRepository.findBookingsByItemOwnerIdAndEndAfterOrderByStartDesc(userId, LocalDateTime.now())
+                        .stream()
+                        .map(BookingMapper::toBookingWithItemAndUserDto)
+                        .collect(Collectors.toList());
+
+            default:
+                throw new IncorrectStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
-
-        if (state.equals("ALL")) return listOfBookingWithItemAndUserDto(bookings);
-
-        return listOfBookingWithItemAndUserDto(checkStatus(bookings, state));
-    }
-
-    private void checkUserById(Long userId) throws NotFoundParameterException {
-        if (!userRepository.existsById(userId))
-            throw new NotFoundParameterException("Exception: Wrong user id.");
-    }
-
-    private void checkOwner(Item item, Long userId) throws NotFoundParameterException {
-        if (Objects.equals(userId, item.getOwner()))
-            throw new NotFoundParameterException("Exception: User can't request for this item.");
-    }
-
-    private void checkNotOwner(Item item, Long userId) throws NotFoundParameterException {
-        if (!Objects.equals(userId, item.getOwner()))
-            throw new NotFoundParameterException("Exception: User can't request for this item.");
-    }
-
-    private void checkItem(Long itemId) throws NotFoundParameterException {
-        if (!itemRepository.existsById(itemId))
-            throw new NotFoundParameterException("Exception: Wrong item id.");
-
-        Item item = itemRepository.getReferenceById(itemId);
-
-        if (item.getAvailable().equals(false))
-            throw new IncorrectParameterException("Exception: Item status unavailable.");
-    }
-
-    private void checkBookingById(Long bookingId) throws NotFoundParameterException {
-        if (!bookingRepository.existsById(bookingId))
-            throw new NotFoundParameterException("Exception: Wrong booking id.");
-    }
-
-    private void checkBookingTimings(BookingDto bookingDto) {
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
-            throw new IncorrectParameterException("Exception: Booking start after end booking.");
-
-        if (bookingDto.getStart().isBefore(LocalDateTime.now()))
-            throw new IncorrectParameterException("Exception: booking cannot start in the past.");
-    }
-
-    private List<Booking> checkStatus(List<Booking> bookings, String state) {
-
-        List<Booking> bookingList = new ArrayList<>();
-
-        for (Booking currentBooking : bookings) {
-            switch (state) {
-                case "CURRENT":
-                    if (currentBooking.getEnd().isAfter(LocalDateTime.now())
-                            && currentBooking.getStart().isBefore(LocalDateTime.now()))
-                        bookingList.add(currentBooking);
-                    break;
-                case "WAITING":
-                    if (currentBooking.getStatus().equals(BookingStatus.WAITING))
-                        bookingList.add(currentBooking);
-                    break;
-                case "REJECTED":
-                    if (currentBooking.getStatus().equals(BookingStatus.REJECTED))
-                        bookingList.add(currentBooking);
-                    break;
-                case "PAST":
-                    if (currentBooking.getEnd().isBefore(LocalDateTime.now()))
-                        bookingList.add(currentBooking);
-                    break;
-                case "FUTURE":
-                    if (currentBooking.getStart().isAfter(LocalDateTime.now()))
-                        bookingList.add(currentBooking);
-                    break;
-                default:
-                    throw new IncorrectStatusException("Unknown state: UNSUPPORTED_STATUS");
-            }
-        }
-
-        return bookingList;
-    }
-
-    private BookingWithItemAndUserDto getBookingWithItemAndUserDto(BookingDto bookingDto) {
-
-        BookingWithItemAndUserDto bookingWithItemAndUserDto = toBookingWithItemAndUserDto(
-                toBookingDto(bookingRepository.findBookingByStartAndEndAndBookerIdAndItemId(
-                        bookingDto.getStart(),
-                        bookingDto.getEnd(),
-                        bookingDto.getBookerId(),
-                        bookingDto.getItemId())
-                )
-        );
-
-        bookingWithItemAndUserDto.setBooker(toUserDto(userRepository.getReferenceById(bookingDto.getBookerId())));
-        bookingWithItemAndUserDto.setItem(toItemDto(itemRepository.getReferenceById(bookingDto.getItemId())));
-
-        return bookingWithItemAndUserDto;
-    }
-
-    private List<BookingWithItemAndUserDto> listOfBookingWithItemAndUserDto(List<Booking> bookings) {
-        return bookings
-                .stream()
-                .map(BookingMapper::toBookingDto)
-                .map(this::getBookingWithItemAndUserDto)
-                .collect(Collectors.toList());
     }
 }
