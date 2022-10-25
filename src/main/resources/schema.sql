@@ -33,6 +33,8 @@ create table if not exists requests (
     id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description  VARCHAR(4000) NOT NULL,
     requester_id BIGINT NOT NULL,
+    date_created TIMESTAMP NOT NULL,
+    CONSTRAINT PK_REQUEST PRIMARY KEY (id),
     CONSTRAINT FK_REQUESTS_TO_USERS FOREIGN KEY(requester_id) REFERENCES users(user_id)
 );
 
