@@ -17,19 +17,17 @@ public class ItemRequestDto {
     private Long id;
     private String description;
     private LocalDateTime created;
-    private List<ItemInfoDto> items;
+    private List<ItemDataDto> items;
 
     @lombok.Getter
     @lombok.Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ItemInfoDto {
-
+    public static class ItemDataDto {
         private Long id;
         private String name;
         private String description;
         private Boolean available;
         private Long requestId;
     }
-
 }

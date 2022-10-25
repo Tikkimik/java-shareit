@@ -14,5 +14,4 @@ public class RequestDto {
     private final Long id;
     private final String description;
     private final LocalDateTime created;
-
 }

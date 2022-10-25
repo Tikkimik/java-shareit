@@ -6,6 +6,14 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT UQ_USER_EMAIL UNIQUE (user_email)
 );
 
+CREATE TABLE IF NOT EXISTS requests (
+    id           BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    description  VARCHAR(4000) NOT NULL,
+    requester_id BIGINT NOT NULL,
+    date_created TIMESTAMP NOT NULL,
+    CONSTRAINT pk_request PRIMARY KEY (id),
+    CONSTRAINT fk_requester_id FOREIGN KEY (requester_id) REFERENCES users(user_id)
+);
 
 CREATE TABLE IF NOT EXISTS items (
     item_id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -13,9 +21,9 @@ CREATE TABLE IF NOT EXISTS items (
     item_description  VARCHAR(4000) NOT NULL,
     item_is_available Boolean NOT NULL,
     item_owner_id     BIGINT NOT NULL,
-    item_url          VARCHAR(1000),
     item_request_id   BIGINT,
-    CONSTRAINT FK_ITEMS_TO_USERS FOREIGN KEY(item_owner_id) REFERENCES users(user_id), UNIQUE(item_id, item_url)
+    CONSTRAINT FK_ITEMS_TO_USERS FOREIGN KEY(item_owner_id) REFERENCES users(user_id), UNIQUE(item_id),
+    CONSTRAINT FK_ITEM_REQUEST FOREIGN KEY (item_request_id) REFERENCES requests
 );
 
 CREATE TABLE IF NOT EXISTS booking (
@@ -27,15 +35,6 @@ CREATE TABLE IF NOT EXISTS booking (
     status     VARCHAR(50),
     CONSTRAINT FK_BOOKINGS_TO_USERS FOREIGN KEY(booker_id) REFERENCES users(user_id),
     CONSTRAINT FK_BOOKINGS_TO_ITEMS FOREIGN KEY(item_id) REFERENCES items(item_id)
-);
-
-create table if not exists requests (
-    id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    description  VARCHAR(4000) NOT NULL,
-    requester_id BIGINT NOT NULL,
-    date_created TIMESTAMP NOT NULL,
-    CONSTRAINT PK_REQUEST PRIMARY KEY (id),
-    CONSTRAINT FK_REQUESTS_TO_USERS FOREIGN KEY(requester_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS comments (

@@ -59,5 +59,4 @@ public class ItemController {
     public void delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         itemService.delete(userId, itemId);
     }
-
 }
