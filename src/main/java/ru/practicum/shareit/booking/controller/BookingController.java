@@ -1,11 +1,13 @@
 package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingWithItemAndUserDto;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 @Validated
+@Slf4j
 public class BookingController {
 
     private final BookingService bookingService;
@@ -37,8 +40,11 @@ public class BookingController {
                                                               @PositiveOrZero int from,
                                                               @RequestParam(value = "size", defaultValue = "10")
                                                               @Positive int size) throws NotFoundParameterException {
+        log.info("Get booking by booker from={}, size={}", from, size);
+        BookingStatus status = BookingStatus.checkBookingStatus(state);
+
         Pageable pages = PageRequest.of(from / size, size);
-        return bookingService.getBookingByBooker(userId, state, pages);
+        return bookingService.getBookingByBooker(userId, status, pages);
     }
 
     @GetMapping("/owner")
@@ -48,13 +54,17 @@ public class BookingController {
                                                                  @PositiveOrZero int from,
                                                                  @RequestParam(value = "size", defaultValue = "10")
                                                                  @Positive int size) throws NotFoundParameterException {
+        log.info("Get booking by item owner from={}, size={}", from, size);
+        BookingStatus status = BookingStatus.checkBookingStatus(state);
+
         Pageable pages = PageRequest.of(from / size, size);
-        return bookingService.getBookingByItemOwner(userId, state, pages);
+        return bookingService.getBookingByItemOwner(userId, status, pages);
     }
 
     @PostMapping
     public BookingWithItemAndUserDto addBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                 @RequestBody BookingDto bookingDto) throws NotFoundParameterException {
+        log.info("Add booking");
         return bookingService.addBooking(userId, bookingDto);
     }
 
@@ -62,6 +72,7 @@ public class BookingController {
     public BookingWithItemAndUserDto approve(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable Long bookingId,
                                              @RequestParam Boolean approved) throws NotFoundParameterException {
+        log.info("approve booking");
         return bookingService.approve(userId, bookingId, approved);
     }
 }

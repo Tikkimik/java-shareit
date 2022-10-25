@@ -106,14 +106,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingWithItemAndUserDto> getBookingByBooker(Long userId, String state, Pageable pages) throws NotFoundParameterException {
+    public List<BookingWithItemAndUserDto> getBookingByBooker(Long userId, BookingStatus status, Pageable pages) throws NotFoundParameterException {
 
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundParameterException("Exception: Wrong user id."));
 
-        BookingStatus bookingStatus = BookingStatus.checkBookingStatus(state);
-
-        switch (bookingStatus) {
+        switch (status) {
             case ALL:
                 return bookingRepository.findBookingsByBookerIdOrderByStartDesc(userId, pages)
                         .stream()
@@ -123,7 +121,7 @@ public class BookingServiceImpl implements BookingService {
             case WAITING:
 
             case REJECTED:
-                return bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, bookingStatus, pages)
+                return bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, status, pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
@@ -152,14 +150,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingWithItemAndUserDto> getBookingByItemOwner(Long userId, String state, Pageable pages) throws NotFoundParameterException {
+    public List<BookingWithItemAndUserDto> getBookingByItemOwner(Long userId, BookingStatus status, Pageable pages) throws NotFoundParameterException {
 
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundParameterException("Exception: Wrong user id."));
 
-        BookingStatus bookingStatus = BookingStatus.checkBookingStatus(state);
-
-        switch (bookingStatus) {
+        switch (status) {
             case ALL:
                 return bookingRepository.findBookingsByItemOwnerIdOrderByStartDesc(userId, pages)
                         .stream()
@@ -169,7 +165,7 @@ public class BookingServiceImpl implements BookingService {
             case WAITING:
 
             case REJECTED:
-                return bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, bookingStatus, pages)
+                return bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, status, pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
