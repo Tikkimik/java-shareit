@@ -1,11 +1,11 @@
 package ru.practicum.shareit.booking.model;
 
+import ru.practicum.shareit.exceptions.IncorrectStatusException;
+
 public enum BookingStatus {
     WAITING,
     APPROVED,
     REJECTED,
-    CANCELED,
-    UNSUPPORTED_STATUS,
     ALL,
     PAST,
     CURRENT,
@@ -16,6 +16,6 @@ public enum BookingStatus {
             if (s.name().equals(status))
                 return s;
         }
-        return UNSUPPORTED_STATUS;
+        throw new IncorrectStatusException("Unknown state: UNSUPPORTED_STATUS");
     }
 }
