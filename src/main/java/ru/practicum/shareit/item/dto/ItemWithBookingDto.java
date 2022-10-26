@@ -21,12 +21,11 @@ public class ItemWithBookingDto {
     private BookingBookerDto lastBooking;
     private List<CommentWithAuthorAndItemDto> comments;
 
-
     public static class BookingBookerDto {
         private final Long id;
         private final Long bookerId;
 
-        private BookingBookerDto(Long id, Long bookerId) {
+        BookingBookerDto(Long id, Long bookerId) {
             this.id = id;
             this.bookerId = bookerId;
         }
