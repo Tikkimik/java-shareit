@@ -56,6 +56,7 @@ class ItemControllerTest {
                 1L, "Отвертка", "Болтик ей не закрутиш",
                 true, null, null, null);
     }
+
     @Test
     void createItemTest() throws Exception {
         when(itemService.createItem(any(long.class), any(ItemDto.class)))

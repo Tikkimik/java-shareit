@@ -43,11 +43,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) throws NotFoundParameterException {
         User owner = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundParameterException("Exception: Wrong item id."));
+                new NotFoundParameterException("Exception: Owner item id."));
 
         if (itemDto.getRequestId() != null) {
-            ItemRequest request = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(()
-                    -> new NotFoundParameterException("Exception: Request not found."));
+            ItemRequest request = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new NotFoundParameterException("Exception: Request not found."));
             return ItemMapper.toItemDto(itemRepository.save(toItem(itemDto, owner, request)));
         }
 
@@ -56,8 +56,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws NotFoundParameterException {
-        if (!userRepository.existsById(userId))
-            throw new NotFoundParameterException("Exception: Wrong user id.");
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("Exception: Wrong user id."));
 
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundParameterException("Exception: Wrong item id."));
