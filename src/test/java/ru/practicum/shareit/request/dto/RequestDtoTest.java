@@ -26,4 +26,5 @@ class RequestDtoTest {
         assertThat(test).extractingJsonPathNumberValue("$.id").isEqualTo(11);
         assertThat(test).extractingJsonPathStringValue("$.description").isEqualTo("Pizza");
     }
+
 }

@@ -22,4 +22,5 @@ class ItemRequestDescriptionDtoTest {
 
         assertThat(test).extractingJsonPathStringValue("$.description").isEqualTo("Pizza");
     }
+
 }
