@@ -53,7 +53,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void NotFoundParameterExceptionAddTest() {
+    void notFoundParameterExceptionAddTest() {
         ItemRequestDescriptionDto itemRequestDto = new ItemRequestDescriptionDto("test");
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -80,7 +80,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionUsingGetRequestsByUserWithWrongUserId() {
+    void notFoundParameterExceptionGetByUserTest() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         Exception exception = Assertions.assertThrows(
@@ -103,7 +103,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionUsingRequestByIdWithWrongUserId() {
+    void notFoundParameterExceptionGetByIdTest() {
         User user = new User(1L, "test", "test@gmail.com");
         ItemRequest itemRequest = new ItemRequest(1L, "test", user, LocalDateTime.now(), null);
 
@@ -117,7 +117,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void shouldReturnRequestUsingRequestByIdWithWrongRequestId() {
+    void notFoundParameterExceptionWrongRequestTest() {
         User user = new User(1L, "test", "test@gmail.com");
         ItemRequest itemRequest = new ItemRequest(1L, "test", user, LocalDateTime.now(), null);
 
