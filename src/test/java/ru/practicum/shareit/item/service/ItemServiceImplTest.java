@@ -197,8 +197,6 @@ class ItemServiceImplTest {
         verify(itemRepository, times(1)).deleteById(item.getId());
     }
 
-
-
     @Test
     void getItemTest() {
         when(userRepository.existsById(anyLong())).thenReturn(true);
