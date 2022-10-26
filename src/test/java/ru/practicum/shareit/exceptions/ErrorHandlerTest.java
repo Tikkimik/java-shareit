@@ -20,7 +20,7 @@ class ErrorHandlerTest {
         ErrorHandler errorHandler = new ErrorHandler();
         NotFoundParameterException exception = new NotFoundParameterException("bad");
         errorHandler.handleNotFoundParameterException(exception);
-        MatcherAssert.assertThat("NotFoundParameterException \"" + exception.getMessage() +"\".",
+        MatcherAssert.assertThat("NotFoundParameterException \"" + exception.getMessage() + "\".",
                 equalTo(errorHandler.handleNotFoundParameterException(exception).getError()));
     }
 
