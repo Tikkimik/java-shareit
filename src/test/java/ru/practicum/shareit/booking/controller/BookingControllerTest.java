@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -15,6 +16,7 @@ import ru.practicum.shareit.booking.dto.BookingWithItemAndUserDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -103,12 +106,31 @@ class BookingControllerTest {
     }
 
     @Test
-    void addBooking() {
+    void addBookingTest() throws Exception {
+        when(bookingService.addBooking(any(long.class), any(BookingDto.class)))
+                .thenReturn(bookingWithItemAndUserDto);
+
+        mvc.perform(post("/bookings")
+                        .content(mapper.writeValueAsString(bookingDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(bookingWithItemAndUserDto.getId()), long.class))
+                .andExpect(jsonPath("$.status", is(bookingWithItemAndUserDto.getStatus().toString())));
 
     }
 
     @Test
-    void approve() {
+    void approveTest() throws Exception {
+        when(bookingService.approve(any(long.class), any(long.class), any(boolean.class)))
+                .thenReturn(bookingWithItemAndUserDto);
 
+        mvc.perform(MockMvcRequestBuilders.patch("/bookings/155?approved=true")
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(bookingWithItemAndUserDto.getId()), long.class))
+                .andExpect(jsonPath("$.status", is(bookingWithItemAndUserDto.getStatus().toString())));
     }
 }
