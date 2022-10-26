@@ -214,5 +214,4 @@ class BookingServiceImplTest {
         assertThat(test.get(0).getEnd(), equalTo(bookingDto.getEnd()));
         assertThat(test.get(0).getStatus(), equalTo(BookingStatus.REJECTED));
     }
-
 }
