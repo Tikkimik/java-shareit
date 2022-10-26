@@ -48,7 +48,7 @@ class UserServiceImplTest {
     }
 
     @AfterEach
-    void AfterEach() {
+    void afterEach() {
         mockitoSession.finishMocking();
     }
 
