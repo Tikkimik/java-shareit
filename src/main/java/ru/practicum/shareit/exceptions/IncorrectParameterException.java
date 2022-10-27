@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exceptions;
 
 public class IncorrectParameterException extends RuntimeException {
+
     private final String parameter;
 
     public IncorrectParameterException(String parameter) {
@@ -10,4 +11,5 @@ public class IncorrectParameterException extends RuntimeException {
     public String getParameter() {
         return parameter;
     }
+
 }

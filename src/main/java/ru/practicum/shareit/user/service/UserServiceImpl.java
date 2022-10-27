@@ -1,57 +1,56 @@
 package ru.practicum.shareit.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.CreatingException;
+import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.user.model.UserMapper.toUser;
+import static ru.practicum.shareit.user.model.UserMapper.toUserDto;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public UserDto createUser(UserDto userDto) throws CreatingException {
-        User user = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userRepository.createUser(user));
+    public UserDto save(UserDto userDto) {
+        return toUserDto(userRepository.save(toUser(userDto)));
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto userDto) throws CreatingException {
-        User userFromStorage = userRepository.getUser(userId);
-        User user = UserMapper.toUser(userDto);
-
-        if (user.getName() != null) {
-            userFromStorage.setName(user.getName());
-        }
-
-        if (user.getEmail() != null) {
-            if (userRepository.checkUserEmail(user)) {
-                userFromStorage.setEmail(user.getEmail());
-            }
-        }
-
-        return UserMapper.toUserDto(userFromStorage);
+    public UserDto findById(Long userId) throws NotFoundParameterException {
+        return toUserDto(userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("Exception: Wrong user id.")));
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return UserMapper.toListUserDto(userRepository.getAllUsers());
+    public List<UserDto> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto getUser(Long userId) {
-        return UserMapper.toUserDto(userRepository.getUser(userId));
+    public void deleteById(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        userRepository.deleteUser(userId);
+    public UserDto update(Long userId, UserDto userDto) throws NotFoundParameterException {
+        User updatedUser = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("Exception: Wrong user id."));
+
+        if (userDto.getName() != null) updatedUser.setName(userDto.getName());
+        if (userDto.getEmail() != null) updatedUser.setEmail(userDto.getEmail());
+        return toUserDto(userRepository.save(updatedUser));
     }
 }

@@ -1,10 +1,10 @@
 package ru.practicum.shareit.exceptions;
 
-public class NotFoundParameterException extends Exception {
+public class IncorrectStatusException extends RuntimeException {
 
     private final String parameter;
 
-    public NotFoundParameterException(String parameter) {
+    public IncorrectStatusException(String parameter) {
         this.parameter = parameter;
     }
 

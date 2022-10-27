@@ -1,20 +1,22 @@
 package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.exceptions.CreatingException;
+import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
 public interface UserService {
 
-    UserDto createUser(UserDto userDto) throws CreatingException;
+    UserDto save(UserDto userDto) throws CreatingException;
 
-    UserDto updateUser(Long userId, UserDto userDto) throws CreatingException;
+    UserDto update(Long userId, UserDto userDto) throws NotFoundParameterException;
 
-    List<UserDto> getAllUsers();
+    List<UserDto> findAll();
 
-    UserDto getUser(Long userId);
+    UserDto findById(Long userId) throws NotFoundParameterException;
 
-    void deleteUser(Long userId);
+    void deleteById(Long userId) throws NotFoundParameterException;
+
 }
 

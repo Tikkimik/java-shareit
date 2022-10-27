@@ -1,22 +1,25 @@
 package ru.practicum.shareit.item.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
+import ru.practicum.shareit.helpers.Create;
+import ru.practicum.shareit.helpers.Update;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentWithAuthorAndItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/items")
+@RequiredArgsConstructor
 public class ItemController {
 
-    @Autowired
-    private ItemServiceImpl itemService;
+    private final ItemServiceImpl itemService;
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
@@ -28,21 +31,33 @@ public class ItemController {
     public ItemDto updateItem(@PathVariable Long itemId,
                               @RequestHeader(value = "X-Sharer-User-Id") Long userId,
                               @Validated({Update.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
-        return itemService.updateItem(itemId, userId, itemDto);
+        return itemService.updateItem(userId, itemId, itemDto);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItems(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
-        return itemService.getAllItems(userId);
+    public List<ItemWithBookingDto> getAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.getAllByUserId(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId) throws NotFoundParameterException {
-        return itemService.getItem(itemId);
+    public ItemWithBookingDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) throws NotFoundParameterException {
+        return itemService.getItem(userId, itemId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchAvailableItem(@RequestParam String text) {
         return itemService.searchAvailableItem(text);
     }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentWithAuthorAndItemDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
+                                                  @RequestBody CommentDto commentDto) {
+        return itemService.addComment(userId, itemId, commentDto);
+    }
+
+    @DeleteMapping("/{itemId}")
+    public void delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        itemService.delete(userId, itemId);
+    }
+
 }
