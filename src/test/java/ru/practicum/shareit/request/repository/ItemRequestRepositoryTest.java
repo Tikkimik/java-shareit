@@ -19,28 +19,25 @@ import java.util.List;
 class ItemRequestRepositoryTest {
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ItemRequestRepository itemRequestRepository;
+    private ItemRequestRepository itemRequestRepository;
 
-    Item item;
-    User user;
-    User user2;
-    ItemRequest request1;
-    ItemRequest request2;
-    ItemRequest request3;
+    private User user;
+    private ItemRequest request1;
+    private ItemRequest request3;
 
     @BeforeEach
     void beforeEach() {
         user = userRepository.save(new User(null, "test1", "test1@mail.ru"));
-        user2 = userRepository.save(new User(null, "test2", "test2@mail.ru"));
-        item = itemRepository.save(new Item(null, "test", "test", true, user2, request1));
+        User user2 = userRepository.save(new User(null, "test2", "test2@mail.ru"));
+        itemRepository.save(new Item(null, "test", "test", true, user2, request1));
         request1 = itemRequestRepository.save(new ItemRequest(null, "test1", user, LocalDateTime.now(), null));
-        request2 = itemRequestRepository.save(new ItemRequest(null, "test2", user, LocalDateTime.now(), null));
+        itemRequestRepository.save(new ItemRequest(null, "test2", user, LocalDateTime.now(), null));
         request3 = itemRequestRepository.save(new ItemRequest(null, "test3", user2, LocalDateTime.now(), null));
     }
 

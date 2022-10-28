@@ -10,30 +10,30 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 @JsonTest
 class BookingWithItemAndUserDtoTest {
 
-        @Autowired
-        private JacksonTester<BookingWithItemAndUserDto> json;
+    @Autowired
+    private JacksonTester<BookingWithItemAndUserDto> json;
 
-        Booking booking = new Booking(1L,
-                null,
-                null,
-                new Item(1L, "Зажигалка", "Вроде рабочая нашёл во дворе.", true, new User(1L, "Петка", "vasyan@rambler.kz"), null),
-                new User(2L, "Алёша", "02@mail.ru"),
-                null);
+    private final Booking booking = new Booking(1L,
+            null,
+            null,
+            new Item(1L, "Зажигалка", "Вроде рабочая нашёл во дворе.", true, new User(1L, "Петка", "vasyan@rambler.kz"), null),
+            new User(2L, "Алёша", "02@mail.ru"),
+            null);
 
     @Test
     void bookingWithItemAndUserDtoTest() throws Exception {
-        BookingWithItemAndUserDto bookingWithItemAndUserDto =  new BookingWithItemAndUserDto(
-                    booking.getId(),
-                    booking.getStart(),
-                    booking.getEnd(),
-                    new BookingWithItemAndUserDto.ItemInfoDto(booking.getItem().getId(), booking.getItem().getName()),
-                    new BookingWithItemAndUserDto.UserInfoDto(booking.getBooker().getId()),
-                    booking.getStatus()
-            );
-
+        BookingWithItemAndUserDto bookingWithItemAndUserDto = new BookingWithItemAndUserDto(
+                booking.getId(),
+                booking.getStart(),
+                booking.getEnd(),
+                new BookingWithItemAndUserDto.ItemInfoDto(booking.getItem().getId(), booking.getItem().getName()),
+                new BookingWithItemAndUserDto.UserInfoDto(booking.getBooker().getId()),
+                booking.getStatus()
+        );
 
         JsonContent<BookingWithItemAndUserDto> result = json.write(bookingWithItemAndUserDto);
 

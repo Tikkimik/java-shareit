@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 class ErrorHandlerTest {
 
-    ErrorHandler errorHandler;
+    protected ErrorHandler errorHandler;
 
     @BeforeEach
     void beforeEach() {
@@ -27,9 +27,36 @@ class ErrorHandlerTest {
     @Test
     void handleThrowableException() {
         ErrorHandler errorHandler = new ErrorHandler();
-        Throwable exception = new Throwable("bad");
+        Throwable exception = new Throwable("Throwable");
         errorHandler.handleThrowableException(exception);
         MatcherAssert.assertThat(exception.getMessage(),
                 equalTo(errorHandler.handleThrowableException(exception).getError()));
+    }
+
+    @Test
+    void handleIncorrectStatusException() {
+        ErrorHandler errorHandler = new ErrorHandler();
+        IncorrectStatusException exception = new IncorrectStatusException("IncorrectStatusException");
+        errorHandler.handleIncorrectStatusException(exception);
+        MatcherAssert.assertThat(exception.getMessage(),
+                equalTo(errorHandler.handleIncorrectStatusException(exception).getError()));
+    }
+
+    @Test
+    void handleCreatingException() {
+        ErrorHandler errorHandler = new ErrorHandler();
+        CreatingException exception = new CreatingException("CreatingException");
+        errorHandler.handleCreatingException(exception);
+        MatcherAssert.assertThat(exception.getParameter(),
+                equalTo(errorHandler.handleCreatingException(exception).getError()));
+    }
+
+    @Test
+    void handleIncorrectParameterException() {
+        ErrorHandler errorHandler = new ErrorHandler();
+        IncorrectParameterException exception = new IncorrectParameterException("bad");
+        errorHandler.handleIncorrectParameterException(exception);
+        MatcherAssert.assertThat("IncorrectParameterException \"" + exception.getParameter() + "\".",
+                equalTo(errorHandler.handleIncorrectParameterException(exception).getError()));
     }
 }

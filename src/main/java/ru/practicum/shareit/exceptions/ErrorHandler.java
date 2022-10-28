@@ -39,6 +39,12 @@ public class ErrorHandler {
         return new ErrorResponse(String.format("NotFoundParameterException \"%s\".", e.getParameter()));
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleCreatingException(final Throwable e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowableException(final Throwable e) {

@@ -25,9 +25,9 @@ import static org.mockito.Mockito.when;
 
 class ItemRequestServiceImplTest {
 
-    UserRepository userRepository;
-    ItemRequestService itemRequestService;
-    ItemRequestRepository itemRequestRepository;
+    private UserRepository userRepository;
+    private ItemRequestService itemRequestService;
+    private ItemRequestRepository itemRequestRepository;
 
     @BeforeEach
     void beforeEach() {

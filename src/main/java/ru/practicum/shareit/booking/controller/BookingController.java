@@ -30,6 +30,7 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public BookingWithItemAndUserDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable Long bookingId) throws NotFoundParameterException, CreatingException {
+        log.info("Get extended booking information");
         return bookingService.getById(userId, bookingId);
     }
 

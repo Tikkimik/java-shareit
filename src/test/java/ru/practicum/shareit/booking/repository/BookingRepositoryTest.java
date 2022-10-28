@@ -23,20 +23,20 @@ import java.util.List;
 class BookingRepositoryTest {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
-    User vasya;
-    User chel;
-    User masha;
-    Item otvertka;
-    Booking booking;
-    Booking booking2;
+    private User vasya;
+    private User chel;
+    private User masha;
+    private Item otvertka;
+    private Booking booking;
+    private Booking booking2;
 
     @BeforeEach
     void beforeEach() {

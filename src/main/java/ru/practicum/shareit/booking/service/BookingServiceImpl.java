@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IncorrectParameterException("Exception: Item is not available.");
 
         if (item.getOwner().equals(user))
-            throw new NotFoundParameterException("Exception: Item has another owner");
+            throw new NotFoundParameterException("Exception: Item has another owner.");
 
         Booking booking = toBooking(bookingDto, user, item, BookingStatus.WAITING);
 
@@ -80,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingWithItemAndUserDto approve(Long userId, Long bookingId, Boolean approved) throws NotFoundParameterException {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
-                new NotFoundParameterException("Exception: Booking not found"));
+                new NotFoundParameterException("Exception: Booking not found."));
 
         if (booking.getStatus().equals(BookingStatus.APPROVED))
             throw new IncorrectParameterException(String.format(

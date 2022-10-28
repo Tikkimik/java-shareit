@@ -18,18 +18,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ItemRepositoryTest {
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    User user;
-    Item item;
+    private User user;
 
     @BeforeEach
     void beforeEach() {
         user = userRepository.save(new User(null, "Ричард", "Haselhoff007@chsv.us"));
-        item = itemRepository.save(new Item(null, "Бензопила", "Лучший инструмент во времена апокалипсиса.", true, user, null));
+        itemRepository.save(new Item(null, "Бензопила", "Лучший инструмент во времена апокалипсиса.", true, user, null));
     }
 
     @Test

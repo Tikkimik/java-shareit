@@ -10,6 +10,7 @@ import org.mockito.MockitoSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.CreatingException;
+import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentWithAuthorAndItemDto;
@@ -19,12 +20,14 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,21 +42,19 @@ import static org.mockito.Mockito.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemServiceImplTest {
 
-    ItemService itemService;
-    ItemRepository itemRepository;
-    UserRepository userRepository;
-    BookingRepository bookingRepository;
-    CommentRepository commentRepository;
-    ItemRequestRepository itemRequestRepository;
+    private ItemService itemService;
+    private ItemRepository itemRepository;
+    private UserRepository userRepository;
+    private BookingRepository bookingRepository;
+    private CommentRepository commentRepository;
+    private ItemRequestRepository itemRequestRepository;
 
-    Item item;
-    Item item2;
-    User user;
-    User user2;
-    ItemDto itemDto;
-
+    private Item item;
+    private User user;
+    private User user2;
+    private ItemDto itemDto;
+    private CommentDto commentDto;
     private MockitoSession mockitoSession;
-
 
     @BeforeEach
     void beforeEach() {
@@ -68,16 +69,14 @@ class ItemServiceImplTest {
 
         user = new User(1L, "test", "test@gmail.com");
         user2 = new User(2L, "test2", "test2@gmail.com");
-
         item = new Item(1L, "Лопата", "Помагает создавать дыры в земле", true, user, null);
-        item2 = new Item(2L, "Бетономешалка>", "Мешает бетон!", true, user, null);
-
         itemDto = new ItemDto();
         itemDto.setId(null);
         itemDto.setName("Лопата");
         itemDto.setDescription("Помагает создавать дыры в земле");
         itemDto.setAvailable(true);
         itemDto.setRequestId(null);
+        commentDto = new CommentDto(1L, "mew");
     }
 
     @AfterEach
@@ -101,18 +100,13 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void createItemFailTest() throws NotFoundParameterException {
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
-
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
-                () -> itemService.createItem(user.getId(), itemDto));
-
-        Assertions.assertEquals("Exception: Owner item id.", exception.getMessage());
-    }
-
-    @Test
     void createItemWithRequestTest() throws NotFoundParameterException, CreatingException {
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+        itemDto.setRequestId(1L);
+        ItemRequest itemRequest = new ItemRequest(1L, "item request", user, LocalDateTime.now(), items);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(itemRequestRepository.findById(itemDto.getRequestId())).thenReturn(Optional.of(itemRequest));
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
         ItemDto test = itemService.createItem(user.getId(), itemDto);
@@ -122,7 +116,6 @@ class ItemServiceImplTest {
         assertEquals(itemDto.getName(), test.getName());
         assertEquals(itemDto.getDescription(), test.getDescription());
         assertEquals(itemDto.getAvailable(), test.getAvailable());
-        assertEquals(itemDto.getRequestId(), test.getRequestId());
     }
 
     @Test
@@ -212,7 +205,119 @@ class ItemServiceImplTest {
 
     @Test
     void shouldGetAllByUserTest() {
-        List<ItemWithBookingDto> test = itemService.getAllByUserId(user.getId());
+        itemService.getAllByUserId(user.getId());
         verify(itemRepository, times(1)).findAllById(item.getId());
+    }
+
+    @Test
+    void createItemFailTest() throws NotFoundParameterException {
+        when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+                () -> itemService.createItem(user.getId(), itemDto));
+
+        Assertions.assertEquals("Exception: Owner item id.", exception.getMessage());
+    }
+
+    @Test
+    void updateUserFailTest() throws NotFoundParameterException {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+                () -> itemService.updateItem(user.getId(), item.getId(), itemDto));
+
+        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
+    }
+
+    @Test
+    void updateItemFailTest() throws NotFoundParameterException {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+                () -> itemService.updateItem(user.getId(), item.getId(), itemDto));
+
+        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
+    }
+
+    @Test
+    void updateOwnerFailTest() throws NotFoundParameterException {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user2));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+                () -> itemService.updateItem(user2.getId(), item.getId(), itemDto));
+
+        Assertions.assertEquals("Exception: You must be the owner of an item to upgrade it.", exception.getMessage());
+    }
+
+    @Test
+    void getItemFailTest() {
+        when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+                () -> itemService.getItem(user.getId(), item.getId()));
+
+        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
+
+    }
+
+    @Test
+    void getFailItemTest() {
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+                () -> itemService.getItem(user.getId(), item.getId()));
+
+        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
+    }
+
+    @Test
+    void addCommentUserFailTest() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+                () -> itemService.addComment(user.getId(), item.getId(), commentDto));
+
+        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
+    }
+
+    @Test
+    void addCommentItemFailTest() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+                () -> itemService.addComment(user.getId(), item.getId(), commentDto));
+
+        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
+    }
+
+    @Test
+    void addCommentExistsBookingByItemIdAndBookerIdAndEndBeforeFailTest() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+        when(bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(anyLong(), anyLong(), any()))
+                .thenReturn(false);
+
+        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+                () -> itemService.addComment(user.getId(), item.getId(), commentDto));
+
+        Assertions.assertEquals("The user has not used this item yet.", exception.getMessage());
+    }
+
+    @Test
+    void addCommentTextFailTest() {
+        commentDto.setText("");
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+        when(bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(anyLong(), anyLong(), any()))
+                .thenReturn(true);
+
+        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+                () -> itemService.addComment(user.getId(), item.getId(), commentDto));
+
+        Assertions.assertEquals("Exception: Comment cannot be empty.", exception.getMessage());
     }
 }

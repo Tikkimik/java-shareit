@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.CreatingException;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -26,6 +28,7 @@ public class UserController {
     @PostMapping
     public UserDto save(@Validated({Create.class}) @RequestBody UserDto userDto) throws CreatingException {
         checkUserEmail(userDto);
+        log.info("Create new user.");
         return userService.save(userDto);
     }
 
@@ -33,21 +36,25 @@ public class UserController {
     public UserDto update(@PathVariable Long userId,
                           @Validated({Update.class}) @RequestBody UserDto userDto) throws NotFoundParameterException {
         if (userDto.getEmail() != null) checkUserEmail(userDto);
+        log.info("Update user.");
         return userService.update(userId, userDto);
     }
 
     @GetMapping
     public List<UserDto> findAll() {
+        log.info("Get all users.");
         return userService.findAll();
     }
 
     @GetMapping("/{userId}")
     public UserDto findById(@PathVariable Long userId) throws NotFoundParameterException {
+        log.info("Get user by user id.");
         return userService.findById(userId);
     }
 
     @DeleteMapping("/{userId}")
     public void deleteById(@PathVariable Long userId) throws NotFoundParameterException {
+        log.info("Delete user by user id.");
         userService.deleteById(userId);
     }
 

@@ -119,10 +119,10 @@ public class ItemServiceImpl implements ItemService {
                 new IncorrectParameterException("Exception: Wrong item id."));
 
         if (!bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now()))
-            throw new IncorrectParameterException("The user has not used this item yet");
+            throw new IncorrectParameterException("The user has not used this item yet.");
 
         if (Objects.equals(commentDto.getText(), ""))
-            throw new IncorrectParameterException("Exception: Comment cannot be empty");
+            throw new IncorrectParameterException("Exception: Comment cannot be empty.");
 
         Comment comment = toComment(commentDto, user, item);
         return toCommentWithAuthorAndItemDto(commentRepository.save(comment));
