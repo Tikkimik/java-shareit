@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 import static ru.practicum.shareit.booking.model.BookingMapper.toBookingWithItemAndUserDto;
 import static ru.practicum.shareit.booking.model.BookingStatus.checkBookingStatus;
 
-
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingServiceImplTest {
 

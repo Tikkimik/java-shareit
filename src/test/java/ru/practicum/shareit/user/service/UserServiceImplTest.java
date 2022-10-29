@@ -16,14 +16,12 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static ru.practicum.shareit.user.model.UserMapper.toUser;
 
-@Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserServiceImplTest {
 
@@ -31,11 +29,8 @@ class UserServiceImplTest {
     private UserRepository userRepository;
 
     private UserService userService;
-
     private MockitoSession mockitoSession;
-
     private User user;
-
     private UserDto userDto;
 
     @BeforeEach
