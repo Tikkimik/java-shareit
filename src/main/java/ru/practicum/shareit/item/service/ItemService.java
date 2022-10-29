@@ -24,5 +24,4 @@ public interface ItemService {
     CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) throws CreatingException;
 
     void delete(Long userId, Long itemId);
-
 }

@@ -15,6 +15,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -36,21 +38,26 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) throws NotFoundParameterException {
-        Item item = toItem(itemDto);
+        User owner = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("Exception: Owner item id."));
 
-        item.setOwner(userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundParameterException("Exception: Wrong item id.")));
+        if (itemDto.getRequestId() != null) {
+            ItemRequest request = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new NotFoundParameterException("Exception: Request not found."));
+            return ItemMapper.toItemDto(itemRepository.save(toItem(itemDto, owner, request)));
+        }
 
-        return toItemDto(itemRepository.save(item));
+        return ItemMapper.toItemDto(itemRepository.save(toItem(itemDto, owner)));
     }
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) throws NotFoundParameterException {
-        if (!userRepository.existsById(userId))
-            throw new NotFoundParameterException("Exception: Wrong user id.");
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundParameterException("Exception: Wrong user id."));
 
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundParameterException("Exception: Wrong item id."));
@@ -68,10 +75,12 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemWithBookingDto> getAllByUserId(Long userId) {
         return itemRepository.findAllById(userId)
                 .stream()
-                .map(item -> toItemWithBookingDto(item,
-                        bookingRepository.findNextBooking(LocalDateTime.now(), userId, item.getId()),
-                        bookingRepository.findLastBooking(LocalDateTime.now(), userId, item.getId()),
-                        commentRepository.findCommentsByItemId(item.getId()))
+                .map(item -> toItemWithBookingDto(
+                                item,
+                                bookingRepository.findNextBooking(LocalDateTime.now(), userId, item.getId()),
+                                bookingRepository.findLastBooking(LocalDateTime.now(), userId, item.getId()),
+                                commentRepository.findCommentsByItemId(item.getId())
+                        )
                 )
                 .collect(Collectors.toList());
     }
@@ -98,8 +107,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.search(text.toLowerCase())
                 .stream()
                 .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList()
-                );
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -111,10 +119,10 @@ public class ItemServiceImpl implements ItemService {
                 new IncorrectParameterException("Exception: Wrong item id."));
 
         if (!bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(itemId, userId, LocalDateTime.now()))
-            throw new IncorrectParameterException("The user has not used this item yet");
+            throw new IncorrectParameterException("The user has not used this item yet.");
 
         if (Objects.equals(commentDto.getText(), ""))
-            throw new IncorrectParameterException("Exception: Comment cannot be empty");
+            throw new IncorrectParameterException("Exception: Comment cannot be empty.");
 
         Comment comment = toComment(commentDto, user, item);
         return toCommentWithAuthorAndItemDto(commentRepository.save(comment));
