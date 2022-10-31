@@ -11,9 +11,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -26,17 +23,15 @@ public class ItemRequestController {
 
     @PostMapping
     public RequestDto add(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @Valid @RequestBody ItemRequestDescriptionDto itemRequestDto) throws NotFoundParameterException {
+                          @RequestBody ItemRequestDescriptionDto itemRequestDto) throws NotFoundParameterException {
         log.info("Create new item request.");
         return itemRequestService.add(userId, itemRequestDto);
     }
 
     @GetMapping("/all")
     public List<ItemRequestDto> get(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                    @RequestParam(value = "from", defaultValue = "0")
-                                    @PositiveOrZero Integer from,
-                                    @RequestParam(value = "size", defaultValue = "10")
-                                    @Positive Integer size) throws NotFoundParameterException {
+                                    @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                    @RequestParam(value = "size", defaultValue = "10") Integer size) throws NotFoundParameterException {
         PageRequest pages = PageRequest.of(from / size, size);
         log.info("Get all item request by booker from={}, size={}", from, size);
         return itemRequestService.get(userId, pages);

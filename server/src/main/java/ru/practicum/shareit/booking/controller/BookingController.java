@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -11,10 +12,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
-import org.springframework.data.domain.Pageable;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -37,10 +35,8 @@ public class BookingController {
     @GetMapping
     public List<BookingWithItemAndUserDto> getBookingByBooker(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                               @RequestParam(required = false, defaultValue = "ALL") String state,
-                                                              @RequestParam(value = "from", defaultValue = "0")
-                                                              @PositiveOrZero int from,
-                                                              @RequestParam(value = "size", defaultValue = "10")
-                                                              @Positive int size) throws NotFoundParameterException {
+                                                              @RequestParam(value = "from", defaultValue = "0") int from,
+                                                              @RequestParam(value = "size", defaultValue = "10") int size) throws NotFoundParameterException {
         log.info("Get booking by booker from={}, size={}", from, size);
         BookingStatus status = BookingStatus.checkBookingStatus(state);
 
@@ -51,10 +47,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingWithItemAndUserDto> getBookingByItemOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                                  @RequestParam(required = false, defaultValue = "ALL") String state,
-                                                                 @RequestParam(value = "from", defaultValue = "0")
-                                                                 @PositiveOrZero int from,
-                                                                 @RequestParam(value = "size", defaultValue = "10")
-                                                                 @Positive int size) throws NotFoundParameterException {
+                                                                 @RequestParam(value = "from", defaultValue = "0") int from,
+                                                                 @RequestParam(value = "size", defaultValue = "10") int size) throws NotFoundParameterException {
         log.info("Get booking by item owner from={}, size={}", from, size);
         BookingStatus status = BookingStatus.checkBookingStatus(state);
 
