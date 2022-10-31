@@ -373,7 +373,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(IncorrectStatusException.class,
                 () -> bookingService.getBookingByBooker(1L, checkBookingStatus("kek"), Pageable.ofSize(10)));
 
-        assertEquals("Unknown state: UNSUPPORTED_STATUS", exception.getMessage());
+        Assertions.assertEquals("Unknown state: UNSUPPORTED_STATUS", exception.getMessage());
     }
 
 
@@ -384,7 +384,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.getBookingByBooker(user.getId(), BookingStatus.ALL, Pageable.ofSize(10)));
 
-        assertEquals("Exception: Wrong user id.", exception.getMessage());
+        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
     }
 
     @Test
@@ -398,7 +398,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.getById(user.getId(), booking3.getId()));
 
-        assertEquals("Exception: booking user not found.", exception.getMessage());
+        Assertions.assertEquals("Exception: booking user not found.", exception.getMessage());
     }
 
     @Test
@@ -412,7 +412,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.getById(user.getId(), booking3.getId()));
 
-        assertEquals("Exception: booker not found.", exception.getMessage());
+        Assertions.assertEquals("Exception: booker not found.", exception.getMessage());
     }
 
     @Test
@@ -424,7 +424,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.getById(user.getId(), booking3.getId()));
 
-        assertEquals("Exception: booking item not found.", exception.getMessage());
+        Assertions.assertEquals("Exception: booking item not found.", exception.getMessage());
     }
 
     @Test
@@ -434,7 +434,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.getById(user.getId(), booking3.getId()));
 
-        assertEquals("Exception: booking not found.", exception.getMessage());
+        Assertions.assertEquals("Exception: booking not found.", exception.getMessage());
     }
 
     @Test
@@ -442,7 +442,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
                 () -> bookingService.addBooking(user.getId(), bookingStartAfterEndDto));
 
-        assertEquals("Exception: Booking start time is after end time.", exception.getMessage());
+        Assertions.assertEquals("Exception: Booking start time is after end time.", exception.getMessage());
     }
 
     @Test
@@ -450,7 +450,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
                 () -> bookingService.addBooking(user.getId(), bookingStartBeforeNowDto));
 
-        assertEquals("Exception: Booking start time in past.", exception.getMessage());
+        Assertions.assertEquals("Exception: Booking start time in past.", exception.getMessage());
     }
 
     @Test
@@ -460,7 +460,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.addBooking(user.getId(), bookingDto));
 
-        assertEquals("Exception: Wrong user id.", exception.getMessage());
+        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
     }
 
     @Test
@@ -471,7 +471,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.addBooking(user.getId(), bookingDto));
 
-        assertEquals("Exception: Item doesn't exists.", exception.getMessage());
+        Assertions.assertEquals("Exception: Item doesn't exists.", exception.getMessage());
     }
 
     @Test
@@ -483,7 +483,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
                 () -> bookingService.addBooking(user.getId(), bookingDto));
 
-        assertEquals("Exception: Item is not available.", exception.getMessage());
+        Assertions.assertEquals("Exception: Item is not available.", exception.getMessage());
     }
 
     @Test
@@ -494,7 +494,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.addBooking(user.getId(), bookingDto));
 
-        assertEquals("Exception: Item has another owner.", exception.getMessage());
+        Assertions.assertEquals("Exception: Item has another owner.", exception.getMessage());
     }
 
     @Test
@@ -504,7 +504,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.approve(user.getId(), booking.getId(), true));
 
-        assertEquals("Exception: Booking not found.", exception.getMessage());
+        Assertions.assertEquals("Exception: Booking not found.", exception.getMessage());
     }
 
     @Test
@@ -514,7 +514,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
                 () -> bookingService.approve(user.getId(), booking.getId(), true));
 
-        assertEquals("Exception: Wrong booking status \"APPROVED\".", exception.getMessage());
+        Assertions.assertEquals("Exception: Wrong booking status \"APPROVED\".", exception.getMessage());
     }
 
     @Test
@@ -525,7 +525,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.approve(user.getId(), booking.getId(), true));
 
-        assertEquals("Exception: Wrong user id.", exception.getMessage());
+        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
     }
 
     @Test
@@ -537,7 +537,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.approve(user.getId(), booking.getId(), true));
 
-        assertEquals("Exception: Wrong item id.", exception.getMessage());
+        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
     }
 
     @Test
@@ -549,7 +549,7 @@ class BookingServiceImplTest {
         Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
                 () -> bookingService.approve(user.getId(), booking.getId(), true));
 
-        assertEquals("Exception: Item - owner not found.", exception.getMessage());
+        Assertions.assertEquals("Exception: Item - owner not found.", exception.getMessage());
     }
 
     @Test

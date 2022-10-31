@@ -80,9 +80,9 @@ class ItemRequestControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id", is(request.getId()), Long.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id", Matchers.is(request.getId()), Long.class))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].description",
-                        is(request.getDescription()),
+                        Matchers.is(request.getDescription()),
                         String.class));
 
         Mockito.verify(itemRequestService, Mockito.times(1))
@@ -102,9 +102,9 @@ class ItemRequestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(requestInfoDto.getId()), Long.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(requestInfoDto.getId()), Long.class))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description",
-                        is(requestInfoDto.getDescription()),
+                        Matchers.is(requestInfoDto.getDescription()),
                         String.class));
 
         Mockito.verify(itemRequestService, Mockito.times(1))
