@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -19,7 +20,7 @@ public interface ItemService {
 
     ItemWithBookingDto getItem(Long userId, Long itemId) throws NotFoundParameterException;
 
-    List<ItemDto> searchAvailableItem(String text) throws NotFoundParameterException;
+    List<ItemDto> searchAvailableItem(String text, Pageable pages) throws NotFoundParameterException;
 
     CommentWithAuthorAndItemDto addComment(Long userId, Long itemId, CommentDto commentDto) throws CreatingException;
 

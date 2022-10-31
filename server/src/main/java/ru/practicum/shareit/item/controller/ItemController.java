@@ -2,18 +2,19 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
-import ru.practicum.shareit.helpers.Create;
-import ru.practicum.shareit.helpers.Update;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentWithAuthorAndItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                              @Validated({Create.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException, CreatingException {
+                              @RequestBody ItemDto itemDto) throws NotFoundParameterException, CreatingException {
         log.info("Create new item.");
         return itemService.createItem(userId, itemDto);
     }
@@ -34,7 +35,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable Long itemId,
                               @RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                              @Validated({Update.class}) @RequestBody ItemDto itemDto) throws NotFoundParameterException {
+                              @RequestBody ItemDto itemDto) throws NotFoundParameterException {
         log.info("Update being item.");
         return itemService.updateItem(userId, itemId, itemDto);
     }
@@ -52,9 +53,14 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchAvailableItem(@RequestParam String text) throws NotFoundParameterException {
+    public List<ItemDto> searchAvailableItem(@RequestParam(name = "text", required = false) String text,
+                                             @PositiveOrZero
+                                             @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                             @Positive
+                                             @RequestParam(value = "size", defaultValue = "10") Integer size) throws NotFoundParameterException {
         log.info("get all items by text query.");
-        return itemService.searchAvailableItem(text);
+        Pageable pages = PageRequest.of(from / size, size);
+        return itemService.searchAvailableItem(text, pages);
     }
 
     @PostMapping("/{itemId}/comment")
