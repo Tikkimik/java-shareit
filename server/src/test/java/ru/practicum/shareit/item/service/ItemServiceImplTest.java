@@ -56,12 +56,12 @@ class ItemServiceImplTest {
 
     @BeforeEach
     void beforeEach() {
-        mockitoSession = Mockito.mockitoSession().initMocks(this).startMocking();
-        userRepository = Mockito.mock(UserRepository.class);
-        itemRepository = Mockito.mock(ItemRepository.class);
-        bookingRepository = Mockito.mock(BookingRepository.class);
-        commentRepository = Mockito.mock(CommentRepository.class);
-        itemRequestRepository = Mockito.mock(ItemRequestRepository.class);
+        mockitoSession = mockitoSession().initMocks(this).startMocking();
+        userRepository = mock(UserRepository.class);
+        itemRepository = mock(ItemRepository.class);
+        bookingRepository = mock(BookingRepository.class);
+        commentRepository = mock(CommentRepository.class);
+        itemRequestRepository = mock(ItemRequestRepository.class);
 
         itemService = new ItemServiceImpl(itemRepository, userRepository, commentRepository, bookingRepository, itemRequestRepository);
 
@@ -179,7 +179,7 @@ class ItemServiceImplTest {
 
         List<ItemDto> results = itemService.searchAvailableItem(text);
 
-        Assertions.assertEquals(0, results.size());
+        assertEquals(0, results.size());
     }
 
     @Test
@@ -209,22 +209,22 @@ class ItemServiceImplTest {
 
     @Test
     void createItemFailTest() throws NotFoundParameterException {
-        when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+        Exception exception = assertThrows(NotFoundParameterException.class,
                 () -> itemService.createItem(user.getId(), itemDto));
 
-        Assertions.assertEquals("Exception: Owner item id.", exception.getMessage());
+        assertEquals("Exception: Owner item id.", exception.getMessage());
     }
 
     @Test
     void updateUserFailTest() throws NotFoundParameterException {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+        Exception exception = assertThrows(NotFoundParameterException.class,
                 () -> itemService.updateItem(user.getId(), item.getId(), itemDto));
 
-        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
+        assertEquals("Exception: Wrong user id.", exception.getMessage());
     }
 
     @Test
@@ -232,10 +232,10 @@ class ItemServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+        Exception exception = assertThrows(NotFoundParameterException.class,
                 () -> itemService.updateItem(user.getId(), item.getId(), itemDto));
 
-        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
+        assertEquals("Exception: Wrong item id.", exception.getMessage());
     }
 
     @Test
@@ -243,20 +243,20 @@ class ItemServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user2));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
 
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+        Exception exception = assertThrows(NotFoundParameterException.class,
                 () -> itemService.updateItem(user2.getId(), item.getId(), itemDto));
 
-        Assertions.assertEquals("Exception: You must be the owner of an item to upgrade it.", exception.getMessage());
+        assertEquals("Exception: You must be the owner of an item to upgrade it.", exception.getMessage());
     }
 
     @Test
     void getItemFailTest() {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+        Exception exception = assertThrows(NotFoundParameterException.class,
                 () -> itemService.getItem(user.getId(), item.getId()));
 
-        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
+        assertEquals("Exception: Wrong user id.", exception.getMessage());
 
     }
 
@@ -265,20 +265,20 @@ class ItemServiceImplTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(NotFoundParameterException.class,
+        Exception exception = assertThrows(NotFoundParameterException.class,
                 () -> itemService.getItem(user.getId(), item.getId()));
 
-        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
+        assertEquals("Exception: Wrong item id.", exception.getMessage());
     }
 
     @Test
     void addCommentUserFailTest() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+        Exception exception = assertThrows(IncorrectParameterException.class,
                 () -> itemService.addComment(user.getId(), item.getId(), commentDto));
 
-        Assertions.assertEquals("Exception: Wrong user id.", exception.getMessage());
+        assertEquals("Exception: Wrong user id.", exception.getMessage());
     }
 
     @Test
@@ -286,10 +286,10 @@ class ItemServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+        Exception exception = assertThrows(IncorrectParameterException.class,
                 () -> itemService.addComment(user.getId(), item.getId(), commentDto));
 
-        Assertions.assertEquals("Exception: Wrong item id.", exception.getMessage());
+        assertEquals("Exception: Wrong item id.", exception.getMessage());
     }
 
     @Test
@@ -299,10 +299,10 @@ class ItemServiceImplTest {
         when(bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(anyLong(), anyLong(), any()))
                 .thenReturn(false);
 
-        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+        Exception exception = assertThrows(IncorrectParameterException.class,
                 () -> itemService.addComment(user.getId(), item.getId(), commentDto));
 
-        Assertions.assertEquals("The user has not used this item yet.", exception.getMessage());
+        assertEquals("The user has not used this item yet.", exception.getMessage());
     }
 
     @Test
@@ -313,9 +313,9 @@ class ItemServiceImplTest {
         when(bookingRepository.existsBookingByItemIdAndBookerIdAndEndBefore(anyLong(), anyLong(), any()))
                 .thenReturn(true);
 
-        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
+        Exception exception = assertThrows(IncorrectParameterException.class,
                 () -> itemService.addComment(user.getId(), item.getId(), commentDto));
 
-        Assertions.assertEquals("Exception: Comment cannot be empty.", exception.getMessage());
+        assertEquals("Exception: Comment cannot be empty.", exception.getMessage());
     }
 }

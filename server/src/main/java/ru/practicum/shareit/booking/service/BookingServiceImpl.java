@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
         if (!(user.getId().equals(userId) || item.getOwner().getId().equals(userId)))
             throw new NotFoundParameterException("Exception: booking user not found.");
 
-        return toBookingWithItemAndUserDto(booking);
+        return BookingMapper.toBookingWithItemAndUserDto(booking);
     }
 
     @Override
@@ -71,9 +71,9 @@ public class BookingServiceImpl implements BookingService {
         if (item.getOwner().equals(user))
             throw new NotFoundParameterException("Exception: Item has another owner.");
 
-        Booking booking = toBooking(bookingDto, user, item, BookingStatus.WAITING);
+        Booking booking = BookingMapper.toBooking(bookingDto, user, item, BookingStatus.WAITING);
 
-        return toBookingWithItemAndUserDto(bookingRepository.save(booking));
+        return BookingMapper.toBookingWithItemAndUserDto(bookingRepository.save(booking));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(BookingStatus.REJECTED);
         }
 
-        return toBookingWithItemAndUserDto(bookingRepository.save(booking));
+        return BookingMapper.toBookingWithItemAndUserDto(bookingRepository.save(booking));
     }
 
     @Override
@@ -112,33 +112,33 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundParameterException("Exception: Wrong user id."));
 
         switch (status) {
-            case ALL:
+            case BookingStatus.ALL:
                 return bookingRepository.findBookingsByBookerIdOrderByStartDesc(userId, pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case WAITING:
+            case BookingStatus.WAITING:
 
-            case REJECTED:
+            case BookingStatus.REJECTED:
                 return bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, status, pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case PAST:
+            case BookingStatus.PAST:
                 return bookingRepository.findBookingsByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case CURRENT:
+            case BookingStatus.CURRENT:
                 return bookingRepository.findBookingBookerByCurrentState(userId, LocalDateTime.now(), pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case FUTURE:
+            case BookingStatus.FUTURE:
                 return bookingRepository.findBookingsByBookerIdAndEndAfterOrderByStartDesc(userId, LocalDateTime.now(), pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
@@ -156,33 +156,33 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundParameterException("Exception: Wrong user id."));
 
         switch (status) {
-            case ALL:
+            case BookingStatus.ALL:
                 return bookingRepository.findBookingsByItemOwnerIdOrderByStartDesc(userId, pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case WAITING:
+            case BookingStatus.WAITING:
 
-            case REJECTED:
+            case BookingStatus.REJECTED:
                 return bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, status, pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case PAST:
+            case BookingStatus.PAST:
                 return bookingRepository.findBookingsByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case CURRENT:
+            case BookingStatus.CURRENT:
                 return bookingRepository.findBookingOwnerByCurrentState(userId, LocalDateTime.now(), pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
                         .collect(Collectors.toList());
 
-            case FUTURE:
+            case BookingStatus.FUTURE:
                 return bookingRepository.findBookingsByItemOwnerIdAndEndAfterOrderByStartDesc(userId, LocalDateTime.now(), pages)
                         .stream()
                         .map(BookingMapper::toBookingWithItemAndUserDto)
