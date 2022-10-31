@@ -13,8 +13,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -54,9 +52,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchAvailableItem(@RequestParam(name = "text", required = false) String text,
-                                             @PositiveOrZero
                                              @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                             @Positive
                                              @RequestParam(value = "size", defaultValue = "10") Integer size) throws NotFoundParameterException {
         log.info("get all items by text query.");
         Pageable pages = PageRequest.of(from / size, size);

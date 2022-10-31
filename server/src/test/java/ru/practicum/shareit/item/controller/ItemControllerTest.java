@@ -126,7 +126,7 @@ class ItemControllerTest {
     void searchAvailableItemTest() throws Exception {
         List<ItemDto> list = new ArrayList<>();
         list.add(itemDto);
-        when(itemService.searchAvailableItem(any(String.class)))
+        when(itemService.searchAvailableItem(any(String.class), any()))
                 .thenReturn(list);
         mvc.perform(get("/items/search?text=sometext")
                         .header("X-Sharer-User-Id", 1))

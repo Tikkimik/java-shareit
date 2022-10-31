@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -33,7 +34,7 @@ class ItemRepositoryTest {
 
     @Test
     void shouldReturnItemListWhereConsistKeyword() {
-        List<Item> results = itemRepository.search("инструмент во");
+        List<Item> results = itemRepository.search("инструмент во", Pageable.ofSize(10));
 
         assertNotNull(results);
         assertEquals(1, results.size());
@@ -41,7 +42,7 @@ class ItemRepositoryTest {
 
     @Test
     void shouldReturnEmptyItemListWhenNotExistItemsWithKeyword() {
-        List<Item> results = itemRepository.search("test");
+        List<Item> results = itemRepository.search("test", Pageable.ofSize(10));
 
         assertNotNull(results);
         assertEquals(0, results.size());

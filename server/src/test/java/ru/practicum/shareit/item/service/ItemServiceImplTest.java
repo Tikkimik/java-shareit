@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.IncorrectParameterException;
@@ -177,7 +178,7 @@ class ItemServiceImplTest {
     void searchAvailableItemTest() {
         String text = "";
 
-        List<ItemDto> results = itemService.searchAvailableItem(text);
+        List<ItemDto> results = itemService.searchAvailableItem(text, Pageable.ofSize(10));
 
         Assertions.assertEquals(0, results.size());
     }
