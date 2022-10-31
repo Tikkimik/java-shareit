@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.client.BookingClient;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingState;
-import ru.practicum.shareit.exceptions.CreatingException;
 import ru.practicum.shareit.exceptions.IncorrectStatusException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 
@@ -27,7 +26,7 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<Object> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @PathVariable Long bookingId) throws NotFoundParameterException, CreatingException {
+                                          @PathVariable Long bookingId) throws NotFoundParameterException {
         log.info("Get extended booking information");
         return bookingClient.getById(userId, bookingId);
     }
@@ -46,8 +45,8 @@ public class BookingController {
     @GetMapping("/owner")
     public ResponseEntity<Object> getBookingByItemOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                         @RequestParam(required = false, defaultValue = "ALL") String state,
-                                                        @RequestParam(value = "from", defaultValue = "0") int from,
-                                                        @RequestParam(value = "size", defaultValue = "10") int size) throws NotFoundParameterException {
+                                                        @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") int from,
+                                                        @Positive @RequestParam(value = "size", defaultValue = "10") int size) throws NotFoundParameterException {
         log.info("Get booking by item owner from={}, size={}", from, size);
         BookingState status = BookingState.from(state).orElseThrow(() ->
                 new IncorrectStatusException("Unknown state: UNSUPPORTED_STATUS"));
