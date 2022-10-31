@@ -66,8 +66,10 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingWithItemAndUserDto approve(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable Long bookingId,
-                                             @RequestParam Boolean approved) throws NotFoundParameterException {
-        log.info("approve booking");
+                                             @RequestParam("approved") Boolean approved) throws NotFoundParameterException {
+        log.info("Approve booking - {} by userId - {} approve - {}", bookingId, userId, approved);
         return bookingService.approve(userId, bookingId, approved);
     }
+
+
 }
