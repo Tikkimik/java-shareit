@@ -50,16 +50,4 @@ public class UserController {
         log.info("Delete user by user id.");
         userService.deleteById(userId);
     }
-
-//    private void checkUserEmail(UserDto userDto) throws IncorrectParameterException {
-//
-//        if (userDto.getEmail() == null)
-//            throw new IncorrectParameterException("Exception: Email address cannot be null");
-//
-//        Pattern pattern = Pattern.compile("^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-//        Matcher matcher = pattern.matcher(userDto.getEmail());
-//
-//        if (!matcher.matches())
-//            throw new IncorrectParameterException("Exception: email address not verified.");
-//    }
 }

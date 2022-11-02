@@ -41,8 +41,7 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> searchAvailableItem(Long userId, String text, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of("text", text, "from", from, "size", size
-        );
+        Map<String, Object> parameters = Map.of("text", text, "from", from, "size", size);
         return get("/search?text={text}&from={from}&size={size}", userId, parameters);
     }
 
