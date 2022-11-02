@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.client.BookingClient;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.exceptions.IncorrectParameterException;
 import ru.practicum.shareit.exceptions.IncorrectStatusException;
 import ru.practicum.shareit.exceptions.NotFoundParameterException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -57,7 +59,15 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Object> addBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @RequestBody @Valid BookingDto bookingDto) {
+
         log.info("Creating booking {}, userId {}", bookingDto, userId);
+
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
+            throw new IncorrectParameterException("Exception: Booking start time is after end time.");
+
+        if (bookingDto.getStart().isBefore(LocalDateTime.now()))
+            throw new IncorrectParameterException("Exception: Booking start time in past.");
+
         return bookingClient.addBooking(userId, bookingDto);
     }
 
@@ -68,5 +78,4 @@ public class BookingController {
         log.info("Approve booking - {} by userId - {} approve - {}", bookingId, userId, approved);
         return bookingClient.approve(userId, bookingId, approved);
     }
-
 }

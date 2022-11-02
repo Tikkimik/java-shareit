@@ -53,12 +53,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingWithItemAndUserDto addBooking(Long userId, BookingDto bookingDto) throws NotFoundParameterException {
 
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd()))
-            throw new IncorrectParameterException("Exception: Booking start time is after end time.");
-
-        if (bookingDto.getStart().isBefore(LocalDateTime.now()))
-            throw new IncorrectParameterException("Exception: Booking start time in past.");
-
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundParameterException("Exception: Wrong user id."));
 
