@@ -55,8 +55,6 @@ class BookingServiceImplTest {
     private User user;
     private User user2;
     private BookingDto bookingDto;
-    private BookingDto bookingStartAfterEndDto;
-    private BookingDto bookingStartBeforeNowDto;
     private Booking booking;
     private Booking bookingApproved;
     private Booking booking2;
@@ -118,21 +116,6 @@ class BookingServiceImplTest {
                 LocalDateTime.of(2077, 8, 2, 3, 1),
                 1L
         );
-
-        bookingStartAfterEndDto = new BookingDto(
-                1L,
-                LocalDateTime.of(2077, 8, 2, 3, 1),
-                LocalDateTime.of(2077, 7, 7, 7, 7),
-                1L
-        );
-
-        bookingStartBeforeNowDto = new BookingDto(
-                1L,
-                LocalDateTime.of(1998, 8, 2, 3, 1),
-                LocalDateTime.of(1999, 7, 7, 7, 7),
-                1L
-        );
-
     }
 
     @AfterEach
@@ -435,22 +418,6 @@ class BookingServiceImplTest {
                 () -> bookingService.getById(user.getId(), booking3.getId()));
 
         Assertions.assertEquals("Exception: booking not found.", exception.getMessage());
-    }
-
-    @Test
-    void addBookingStartAfterEndFilTest() {
-        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
-                () -> bookingService.addBooking(user.getId(), bookingStartAfterEndDto));
-
-        Assertions.assertEquals("Exception: Booking start time is after end time.", exception.getMessage());
-    }
-
-    @Test
-    void addBookingStartStartBeforeNowFilTest() {
-        Exception exception = Assertions.assertThrows(IncorrectParameterException.class,
-                () -> bookingService.addBooking(user.getId(), bookingStartBeforeNowDto));
-
-        Assertions.assertEquals("Exception: Booking start time in past.", exception.getMessage());
     }
 
     @Test
